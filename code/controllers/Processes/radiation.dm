@@ -5,7 +5,7 @@ var/datum/controller/process/radiation/rad_master
 
 /datum/controller/process/radiation/setup()
 	name = "radiation"
-	schedule_interval = 10 * 10 // every ten seconds
+	schedule_interval = 2 * 10 // every 2 seconds
 	hotspots = list()
 
 	rad_master = src
@@ -18,12 +18,9 @@ var/datum/controller/process/radiation/rad_master
 	if (!hotspots || !hotspots.len)
 		return
 
-	if (ticks % 2)	// don't need to update this every time
-		update_work_factor()
-
 	// only process one at a time
 	var/target = hotspots[1]
-
+	target.process()
 
 /datum/controller/process/radiation/register_hotspot(var/turf/origin, var/intensity, var/transient = 0, var/simulate_now = 0)
 	var/datum/radiation_hotspot/hotspot = new(origin, intensity)
@@ -56,6 +53,8 @@ var/datum/controller/process/radiation/rad_master
 		var/curr = get_step_towards(curr, target)
 		while (curr != target)
 			curr = get_step_towards(curr, target)
+			rads *= get_decay_factor(curr)
+		if (Debug2) world.log << "## DEBUG: [L] irradiated with [rads] rads from origin [origin]"
 		
 /datum/radiation_hotspot/proc/get_decay_factor(var/turf/target)
 	var/turf/simulated/T = target
