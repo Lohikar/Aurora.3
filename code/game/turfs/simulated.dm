@@ -13,6 +13,7 @@
 	var/to_be_destroyed = 0 //Used for fire, if a melting temperature was reached, it will be destroyed
 	var/max_fire_temperature_sustained = 0 //The max temperature of the fire which it was subjected to
 	var/dirt = 0
+	var/radiation_decay = 1	// How many rads are absorbed by this turf
 
 	var/datum/scheduled_task/unwet_task
 
