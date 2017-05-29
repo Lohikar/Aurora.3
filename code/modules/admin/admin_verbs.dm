@@ -131,7 +131,8 @@ var/list/admin_verbs_fun = list(
 	/datum/admins/proc/call_supply_drop,
 	/datum/admins/proc/call_drop_pod,
 	/client/proc/show_tip,
-	/client/proc/fab_tip
+	/client/proc/fab_tip,
+	/client/proc/set_global_view_dir
 	)
 
 var/list/admin_verbs_spawn = list(
@@ -1107,3 +1108,44 @@ var/list/admin_verbs_cciaa = list(
 	log_and_message_admins("has regenerated all openturfs.")
 
 	SSopenturf.hard_reset()
+
+/client/proc/set_global_view_dir()
+	set category = "Fun"
+	set name = "Set Global View Direction"
+	set desc = "Forcibly sets everyone's view direction and prevents them from changing it."
+
+	if (!check_rights(R_FUN))
+		return
+
+	var/static/list/valid_dirs = list(
+		"NORTH (default)" = NORTH,
+		"SOUTH" = SOUTH,
+		"EAST" = EAST,
+		"WEST" = WEST,
+		"Disable" = -1
+	)
+
+	var/chosen_dir = input("Pick a global client direction:", "WHEEE") as null|anything in valid_dirs
+	if (!chosen_dir)
+		to_chat(usr, "<span class='notice'>Aborted.</span>")
+		return
+
+	chosen_dir = valid_dirs[chosen_dir]
+
+	if (chosen_dir == -1)
+		global.client_dir_override = null
+	else
+		global.client_dir_override = chosen_dir
+
+	if (chosen_dir == -1)
+		log_and_message_admins("has restored view direction to normal.")
+	else
+		log_and_message_admins("has set the global view direction override to [dir2text(chosen_dir)] ([chosen_dir])!")
+
+		for (var/thing in player_list)
+			var/mob/M = thing
+			if (!istype(M) || !M.client)
+				// ?!
+				continue
+
+			M.client.set_dir()	// null args sets to the global dir.

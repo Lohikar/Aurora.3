@@ -981,8 +981,8 @@
 				if(!handling_hal)
 					spawn handle_hallucinations() //The not boring kind!
 				if(client && prob(5))
-					addtimer(CALLBACK(src, .proc/reset_view_dir, client.dir), rand(20, 50))
-					client.dir = pick(2,4,8)
+					addtimer(CALLBACK(client, /client/.proc/set_dir, client.dir), rand(20, 50))
+					client.set_dir(pick(2, 4, 8))
 
 			if(hallucination<=2)
 				hallucination = 0
@@ -1073,10 +1073,6 @@
 			gloves.germ_level += 1
 
 	return 1
-
-/mob/living/carbon/human/proc/reset_view_dir(original)
-	if (client)
-		client.dir = original
 
 /mob/living/carbon/human/handle_regular_hud_updates()
 	if(hud_updateflag) // update our mob's hud overlays, AKA what others see flaoting above our head
