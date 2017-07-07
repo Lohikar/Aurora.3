@@ -115,6 +115,12 @@ default behaviour is:
 				now_pushing = 1
 
 				if (!AM.anchored)
+					if(isobj(AM))
+						var/obj/O = AM
+						if ((can_pull_size == 0) || (can_pull_size < O.w_class))
+							now_pushing = 0
+							return
+
 					var/t = get_dir(src, AM)
 					if (istype(AM, /obj/structure/window))
 						for(var/obj/structure/window/win in get_step(AM,t))
@@ -162,6 +168,8 @@ default behaviour is:
 		src.adjustOxyLoss(src.health + 200)
 		src.health = 100 - src.getOxyLoss() - src.getToxLoss() - src.getFireLoss() - src.getBruteLoss()
 		src << "\blue You have given up life and succumbed to death."
+	else
+		src << "<span class='warning'>You are not injured enough to succumb to death!</span>"
 
 
 /mob/living/proc/updatehealth()
