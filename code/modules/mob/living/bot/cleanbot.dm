@@ -202,7 +202,7 @@ var/list/cleanbot_types // Going to use this to generate a list of types once th
 
 	cleaning = 1
 	target.being_cleaned = 1
-	update_icons()
+	update_icon()
 	var/cleantime = istype(D, /obj/effect/decal/cleanable/dirt) ? 10 : 50
 	spawn(1)
 		if(do_after(src, cleantime))
@@ -217,7 +217,7 @@ var/list/cleanbot_types // Going to use this to generate a list of types once th
 				target = null
 			qdel(D)
 		cleaning = 0
-		update_icons()
+		update_icon()
 
 /mob/living/bot/cleanbot/explode()
 	on = 0
@@ -233,7 +233,7 @@ var/list/cleanbot_types // Going to use this to generate a list of types once th
 	qdel(src)
 	return
 
-/mob/living/bot/cleanbot/update_icons()
+/mob/living/bot/cleanbot/update_icon()
 	if(cleaning)
 		icon_state = "cleanbot-c"
 	else

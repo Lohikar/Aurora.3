@@ -88,7 +88,7 @@ var/datum/antagonist/wizard/wizards
 	wizard_mob.equip_to_slot_or_del(new /obj/item/weapon/teleportation_scroll(wizard_mob), slot_r_store)
 	var/obj/item/I = new /obj/item/weapon/spellbook(get_turf(wizard_mob))
 	wizard_mob.put_in_hands(I)
-	wizard_mob.update_icons()
+	wizard_mob.update_icon()
 	return 1
 
 /datum/antagonist/wizard/check_victory()

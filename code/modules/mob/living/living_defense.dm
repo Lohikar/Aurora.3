@@ -68,7 +68,7 @@
 	var/obj/item/weapon/cloaking_device/C = locate((/obj/item/weapon/cloaking_device) in src)
 	if(C && C.active)
 		C.attack_self(src)//Should shut it off
-		update_icons()
+		update_icon()
 		src << "<span class='notice'>Your [C.name] was disrupted!</span>"
 		Stun(2)
 

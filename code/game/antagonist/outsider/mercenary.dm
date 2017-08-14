@@ -52,7 +52,7 @@ var/datum/antagonist/mercenary/mercs
 	var/obj/item/device/radio/uplink/U = new(player.loc, player.mind, DEFAULT_TELECRYSTAL_AMOUNT)
 	player.put_in_hands(U)
 
-	player.update_icons()
+	player.update_icon()
 	player.faction = "syndicate"
 
 	create_id("Mercenary", player)
