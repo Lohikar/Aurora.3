@@ -1,5 +1,5 @@
-var/list/mob_hat_cache = list()
 /proc/get_hat_icon(var/obj/item/hat, var/offset_x = 0, var/offset_y = 0)
+	var/list/mob_hat_cache = SSicon_cache.mob_hat_cache
 	var/t_state = hat.icon_state
 	if(hat.item_state_slots && hat.item_state_slots[slot_head_str])
 		t_state = hat.item_state_slots[slot_head_str]
@@ -103,9 +103,8 @@ var/list/mob_hat_cache = list()
 	holder_type = /obj/item/weapon/holder/drone/heavy
 	range_limit = 0
 
-/mob/living/silicon/robot/drone/New()
-
-	..()
+/mob/living/silicon/robot/drone/Initialize()
+	. = ..()
 
 	verbs += /mob/living/proc/hide
 	remove_language("Robot Talk")
@@ -183,7 +182,7 @@ var/list/mob_hat_cache = list()
 		user << "<span class='danger'>\The [src] is not compatible with \the [W].</span>"
 		return
 
-	else if (istype(W, /obj/item/weapon/crowbar))
+	else if (iscrowbar(W))
 		user << "<span class='danger'>\The [src] is hermetically sealed. You can't open the case.</span>"
 		return
 
@@ -350,13 +349,13 @@ var/list/mob_hat_cache = list()
 
 /mob/living/silicon/robot/drone/construction/welcome_drone()
 	src << "<b>You are a construction drone, an autonomous engineering and fabrication system.</b>."
-	src << "You are assigned to a Sol Central construction project. The name is irrelevant. Your task is to complete construction and subsystem integration as soon as possible."
+	src << "You are assigned to a NanoTrasen construction project. The name is irrelevant. Your task is to complete construction and subsystem integration as soon as possible."
 	src << "Use <b>:d</b> to talk to other drones and <b>say</b> to speak silently to your nearby fellows."
 	src << "<b>You do not follow orders from anyone; not the AI, not humans, and not other synthetics.</b>."
 
 /mob/living/silicon/robot/drone/construction/init()
 	..()
-	flavor_text = "It's a bulky construction drone stamped with a Sol Central glyph."
+	flavor_text = "It's a bulky construction drone stamped with a NanoTrasen glyph."
 
 /mob/living/silicon/robot/drone/construction/updatename()
 	real_name = "construction drone ([rand(100,999)])"

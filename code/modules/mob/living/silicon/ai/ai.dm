@@ -49,7 +49,7 @@ var/list/ai_verbs_default = list(
 	density = 1
 	status_flags = CANSTUN|CANPARALYSE|CANPUSH
 	//shouldnt_see - set in New()
-	var/list/network = list("Exodus")
+	var/list/network = list("Station")
 	var/obj/machinery/camera/camera = null
 	var/list/connected_robots = list()
 	var/aiRestorePowerRoutine = 0
@@ -99,7 +99,7 @@ var/list/ai_verbs_default = list(
 	src.verbs -= ai_verbs_default
 	src.verbs -= silicon_subsystems
 
-/mob/living/silicon/ai/New(loc, var/datum/ai_laws/L, var/obj/item/device/mmi/B, var/safety = 0)
+/mob/living/silicon/ai/Initialize(mapload, datum/ai_laws/L, obj/item/device/mmi/B, safety = 0)
 	shouldnt_see = typecacheof(/obj/effect/rune)
 	announcement = new()
 	announcement.title = "A.I. Announcement"
@@ -152,7 +152,7 @@ var/list/ai_verbs_default = list(
 	add_language(LANGUAGE_SIIK_MAAS, 0)
 	add_language(LANGUAGE_SKRELLIAN, 0)
 	add_language("Tradeband", 1)
-	add_language("Gutter", 0)
+	add_language(LANGUAGE_GUTTER, 0)
 	add_language(LANGUAGE_VAURCA, 0)
 	add_language("Rootsong", 0)
 	add_language(LANGUAGE_EAL, 1)
@@ -183,7 +183,7 @@ var/list/ai_verbs_default = list(
 	hud_list[SPECIALROLE_HUD] = image('icons/mob/hud.dmi', src, "hudblank")
 
 	ai_list += src
-	..()
+	return ..()
 
 /mob/living/silicon/ai/proc/init_powersupply()
 	new /obj/machinery/ai_powersupply(src)
@@ -304,7 +304,7 @@ var/list/ai_verbs_default = list(
 	. = ..()
 	powered_ai = null
 
-/obj/machinery/ai_powersupply/process()
+/obj/machinery/ai_powersupply/machinery_process()
 	if(!powered_ai || powered_ai.stat == DEAD)
 		qdel(src)
 		return
@@ -393,7 +393,7 @@ var/list/ai_verbs_default = list(
 
 	// hack to display shuttle timer
 	if(emergency_shuttle.online())
-		var/obj/machinery/computer/communications/C = locate() in machines
+		var/obj/machinery/computer/communications/C = locate() in SSmachinery.processing_machines
 		if(C)
 			C.post_status("shuttle")
 
@@ -676,7 +676,7 @@ var/list/ai_verbs_default = list(
 		var/obj/item/weapon/aicard/card = W
 		card.grab_ai(src, user)
 
-	else if(istype(W, /obj/item/weapon/wrench))
+	else if(iswrench(W))
 		if(anchored)
 			user.visible_message("<span class='notice'>\The [user] starts to unbolt \the [src] from the plating...</span>")
 			if(!do_after(user,40))

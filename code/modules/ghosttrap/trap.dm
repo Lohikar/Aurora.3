@@ -50,7 +50,7 @@ var/list/ghost_traps
 /datum/ghosttrap/proc/request_player(var/mob/target, var/request_string, var/request_timeout)
 	if(request_timeout)
 		request_timeouts[target] = world.time + request_timeout
-		destroyed_event.register(target, src, /datum/ghosttrap/proc/target_destroyed)
+		target.OnDestroy(CALLBACK(src, .proc/target_destroyed))
 	else
 		request_timeouts -= target
 
@@ -64,7 +64,7 @@ var/list/ghost_traps
 		if(pref_check && !(pref_check in O.client.prefs.be_special_role))
 			continue
 		if(O.client)
-			O << "<span class='deadsay'><font size=3><b>[request_string] <a href='?src=\ref[src];candidate=\ref[O];target=\ref[target]'>(Occupy)</a> ([ghost_follow_link(target, O)])</b></font></span>"
+			O << "[ghost_follow_link(target, O)] <span class='deadsay'><font size=3><b>[request_string] <a href='?src=\ref[src];candidate=\ref[O];target=\ref[target]'>(Occupy)</a></b></font></span>"
 
 /datum/ghosttrap/proc/target_destroyed(var/destroyed_target)
 	request_timeouts -= destroyed_target
@@ -223,13 +223,15 @@ datum/ghosttrap/drone/transfer_personality(var/mob/candidate, var/mob/living/sil
 /datum/ghosttrap/syndicateborg
 	object = "syndicate cyborg"
 	ban_checks = list("Antagonist","AI","Cyborg")
-	pref_check = "BE_SYNTH"
+	pref_check = BE_SYNTH
 	ghost_trap_message = "They are occupying a syndicate cyborg now."
 	ghost_trap_role = "Syndicate Cyborg"
 	can_set_own_name = TRUE
+	list_as_special_role = FALSE
 
 /datum/ghosttrap/syndicateborg/welcome_candidate(var/mob/target)
 	target << "<span class='notice'><B>You are a syndicate cyborg, bound to help and follow the orders of the mercenaries that are deploying you. Remember to speak to the other mercenaries to know more about their plans</B></span>"
+	mercs.add_antagonist_mind(target.mind,1)
 
 /**************
 * pAI *
@@ -256,6 +258,7 @@ datum/ghosttrap/pai/transfer_personality(var/mob/candidate, var/mob/living/silic
 	ghost_trap_message = "They are occupying a familiar now."
 	ghost_trap_role = "Wizard Familiar"
 	ban_checks = list(MODE_WIZARD)
+	list_as_special_role = FALSE
 
 /datum/ghosttrap/familiar/welcome_candidate(var/mob/target)
 	return 0
@@ -271,6 +274,7 @@ datum/ghosttrap/pai/transfer_personality(var/mob/candidate, var/mob/living/silic
 	ghost_trap_role = "Skeleton Minion"
 	ban_checks = list(MODE_WIZARD)
 	can_set_own_name = FALSE
+	list_as_special_role = FALSE
 
 /datum/ghosttrap/skeleton/welcome_candidate(var/mob/target)
 	return 0

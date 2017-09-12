@@ -20,7 +20,7 @@ var/datum/controller/subsystem/processing/shuttle/shuttle_controller
 		shuttle.init_docking_controllers()
 		shuttle.dock() //makes all shuttles docked to something at round start go into the docked state
 
-	for(var/obj/machinery/embedded_controller/C in machines)
+	for(var/obj/machinery/embedded_controller/C in SSmachinery.processing_machines)
 		if(istype(C.program, /datum/computer/file/embedded_program/docking))
 			C.program.tag = null //clear the tags, 'cause we don't need 'em anymore
 
@@ -43,7 +43,8 @@ var/datum/controller/subsystem/processing/shuttle/shuttle_controller
 	//shuttle.dock_target_station = "cargo_bay"
 	shuttles["Escape"] = shuttle
 	START_PROCESSING(shuttle_controller, shuttle)
-	log_debug("Escape shuttle [shuttle ? "exists." : "DOES NOT EXIST!"]")
+	if(!shuttle)
+		log_debug("Escape shuttle does not exist!")
 
 	shuttle = new/datum/shuttle/ferry/escape_pod()
 	shuttle.location = 0
@@ -163,6 +164,20 @@ var/datum/controller/subsystem/processing/shuttle/shuttle_controller
 	shuttles["Administration"] = shuttle
 	START_PROCESSING(shuttle_controller, shuttle)
 
+	// Merchant Shuttle
+
+	shuttle = new()
+	shuttle.location = 1
+	shuttle.warmup_time = 10
+	shuttle.area_offsite = locate(/area/merchant_ship/start)
+	shuttle.area_station = locate(/area/merchant_ship/docked)
+	shuttle.docking_controller_tag = "merchant_shuttle"
+	shuttle.dock_target_station = "merchant_shuttle_dock"
+	shuttle.dock_target_offsite = "merchant_station"
+	shuttles["Merchant"] = shuttle
+	START_PROCESSING(shuttle_controller, shuttle)
+
+
 	/*// Public shuttles
 	shuttle = new()
 	shuttle.warmup_time = 10
@@ -201,7 +216,7 @@ var/datum/controller/subsystem/processing/shuttle/shuttle_controller
 	ERT.area_offsite = locate(/area/shuttle/specops/station)	//centcom is the home station, the Exodus is offsite
 	ERT.area_station = locate(/area/shuttle/specops/centcom)
 	ERT.docking_controller_tag = "specops_shuttle_port"
-	ERT.docking_controller_tag_station = "ert_shuttle_dock_airlock"
+	ERT.docking_controller_tag_station = "specops_shuttle_port"
 	ERT.docking_controller_tag_offsite = "specops_shuttle_fore"
 	ERT.dock_target_station = "specops_centcom_dock"
 	ERT.dock_target_offsite = "specops_dock_airlock"
@@ -236,7 +251,8 @@ var/datum/controller/subsystem/processing/shuttle/shuttle_controller
 		"Surface of the station" = locate(/area/syndicate_station/surface),
 		"Above the station" = locate(/area/syndicate_station/above),
 		"Under the station" = locate(/area/syndicate_station/under),
-		"Mining caverns" = locate(/area/syndicate_station/caverns)
+		"Mining caverns" = locate(/area/syndicate_station/caverns),
+		"Arrivals dock" = locate(/area/syndicate_station/arrivals_dock)
 	)
 
 	MS.docking_controller_tag = "merc_shuttle"

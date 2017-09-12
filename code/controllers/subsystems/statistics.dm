@@ -21,6 +21,8 @@
 	var/list/msg_cargo = list()
 	var/list/msg_service = list()
 
+	var/list/datum/statistic/simple_statistics = list()
+
 	var/list/datum/feedback_variable/feedback = list()
 
 /datum/controller/subsystem/statistics/New()
@@ -29,6 +31,16 @@
 /datum/controller/subsystem/statistics/Initialize(timeofday)
 	if (!config.kick_inactive && !(config.sql_enabled && config.sql_stats))
 		can_fire = FALSE
+
+	for (var/type in subtypesof(/datum/statistic) - list(/datum/statistic/numeric, /datum/statistic/grouped))
+		var/datum/statistic/S = new type
+		if (!S.name)
+			qdel(S)
+			continue
+
+		simple_statistics[S.key] = S
+
+	sortTim(simple_statistics, /proc/cmp_name_asc, TRUE)
 
 /datum/controller/subsystem/statistics/fire()
 	// Handle AFK.
@@ -72,7 +84,7 @@
 	src.msg_syndicate = SSfeedback.msg_syndicate
 	src.msg_cargo = SSfeedback.msg_cargo
 	src.msg_service = SSfeedback.msg_service
-	
+
 	src.feedback = SSfeedback.feedback
 
 /datum/controller/subsystem/statistics/proc/find_feedback_datum(variable)
@@ -91,7 +103,7 @@
 	var/pda_msg_amt = 0
 	var/rc_msg_amt = 0
 
-	for(var/obj/machinery/message_server/MS in machines)
+	for(var/obj/machinery/message_server/MS in SSmachinery.all_machines)
 		if(MS.pda_msgs.len > pda_msg_amt)
 			pda_msg_amt = MS.pda_msgs.len
 		if(MS.rc_msgs.len > rc_msg_amt)
@@ -113,8 +125,22 @@
 	feedback_add_details("radio_usage","PDA-[pda_msg_amt]")
 	feedback_add_details("radio_usage","RC-[rc_msg_amt]")
 
+	for (var/key in simple_statistics)
+		var/datum/statistic/S = simple_statistics[key]
+		if (S.write_to_db && S.key)
+			S.write_to_database()
 
 	feedback_set_details("round_end","[time2text(world.realtime)]") //This one MUST be the last one that gets set.
+
+/datum/controller/subsystem/statistics/proc/print_round_end_message()
+	var/list/dat = list()
+	dat += "<h3>Round Statistics</h3>"
+	for (var/statistic in simple_statistics)
+		var/datum/statistic/S = simple_statistics[statistic]
+		if (S.broadcast_at_roundend && S.has_value())
+			dat += span("notice", "<b>[S]:</b> [S.get_roundend_lines()]")
+
+	to_chat(world, dat.Join("\n"))
 
 // Called on world reboot.
 /datum/controller/subsystem/statistics/Shutdown()
@@ -134,7 +160,7 @@
 		var/DBQuery/query_insert = dbcon.NewQuery(sql)
 		query_insert.Execute()
 
-	
+
 // Sanitize inputs to avoid SQL injection attacks
 /proc/sql_sanitize_text(var/text)
 	text = replacetext(text, "'", "''")
@@ -143,7 +169,7 @@
 	return text
 
 /proc/feedback_set(var/variable,var/value)
-	if(!SSfeedback) 
+	if(!SSfeedback)
 		return
 
 	variable = sql_sanitize_text(variable)
@@ -266,3 +292,17 @@
 		if(!query.Execute())
 			var/err = query.ErrorMsg()
 			log_game("SQL ERROR during death reporting. Error : \[[err]\]\n")
+
+/datum/controller/subsystem/statistics/proc/IncrementSimpleStat(stat)
+	. = TRUE
+	var/datum/statistic/numeric/S = simple_statistics[stat]
+	if (!S)
+		return FALSE
+	S.increment_value()
+
+/datum/controller/subsystem/statistics/proc/IncrementGroupedStat(stat, key)
+	. = TRUE
+	var/datum/statistic/grouped/S = simple_statistics[stat]
+	if (!S)
+		return FALSE
+	S.increment_value(key)

@@ -22,22 +22,22 @@
 	var/blood_type = null
 	var/vampire_marks = null
 
-	New()
-		..()
-		if(blood_type != null)
-			name = "BloodPack [blood_type]"
-			reagents.add_reagent("blood", 200, list("donor"=null,"viruses"=null,"blood_DNA"=null,"blood_type"=blood_type,"resistances"=null,"trace_chem"=null))
-			update_icon()
-
-	on_reagent_change()
+/obj/item/weapon/reagent_containers/blood/Initialize()
+	. = ..()
+	if(blood_type != null)
+		name = "BloodPack [blood_type]"
+		reagents.add_reagent("blood", 200, list("donor"=null,"viruses"=null,"blood_DNA"=null,"blood_type"=blood_type,"resistances"=null,"trace_chem"=null))
 		update_icon()
 
+/obj/item/weapon/reagent_containers/blood/on_reagent_change()
 	update_icon()
-		var/percent = round((reagents.total_volume / volume) * 100)
-		switch(percent)
-			if(0 to 9)			icon_state = "empty"
-			if(10 to 50) 		icon_state = "half"
-			if(51 to INFINITY)	icon_state = "full"
+
+/obj/item/weapon/reagent_containers/blood/update_icon()
+	var/percent = round((reagents.total_volume / volume) * 100)
+	switch(percent)
+		if(0 to 9)			icon_state = "empty"
+		if(10 to 50) 		icon_state = "half"
+		if(51 to INFINITY)	icon_state = "full"
 
 /obj/item/weapon/reagent_containers/blood/attack(mob/living/carbon/human/M as mob, mob/living/carbon/human/user as mob, var/target_zone)
 	if (user == M && (user.mind.vampire))
@@ -87,7 +87,7 @@
 
 	if (istype(P, /obj/item/weapon/) && P.sharp == 1)
 		var/mob/living/carbon/human/H = usr
-		if(P.attack_verb.len)
+		if(LAZYLEN(P.attack_verb))
 			user.visible_message("<span class='danger'>[src] has been [pick(P.attack_verb)] with \the [P] by [user]!</span>")
 		var/atkmsg_filled = null
 		if (reagents.get_reagent_amount("blood"))

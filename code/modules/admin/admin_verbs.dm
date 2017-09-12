@@ -63,7 +63,6 @@ var/list/admin_verbs_admin = list(
 	/datum/admins/proc/toggledsay,		//toggles dsay on/off for everyone,
 	/client/proc/game_panel,			//game panel, allows to change game-mode etc,
 	/client/proc/cmd_admin_say,			//admin-only ooc chat,
-	/datum/admins/proc/togglehubvisibility, //toggles visibility on the BYOND Hub,
 	/datum/admins/proc/PlayerNotes,
 	/client/proc/cmd_mod_say,
 	/datum/admins/proc/show_player_info,
@@ -132,7 +131,8 @@ var/list/admin_verbs_fun = list(
 	/datum/admins/proc/call_drop_pod,
 	/client/proc/show_tip,
 	/client/proc/fab_tip,
-	/client/proc/set_global_view_dir
+	/client/proc/set_global_view_dir,
+	/client/proc/apply_sunstate
 	)
 
 var/list/admin_verbs_spawn = list(
@@ -148,7 +148,6 @@ var/list/admin_verbs_spawn = list(
 var/list/admin_verbs_server = list(
 	/datum/admins/proc/capture_map,
 	/client/proc/Set_Holiday,
-	/client/proc/ToRban,
 	/datum/admins/proc/startnow,
 	/datum/admins/proc/restart,
 	/datum/admins/proc/delay,
@@ -171,7 +170,8 @@ var/list/admin_verbs_server = list(
 	/client/proc/toggle_recursive_explosions,
 	/client/proc/restart_controller,
 	/client/proc/cmd_ss_panic,
-	/client/proc/configure_access_control
+	/client/proc/configure_access_control,
+	/datum/admins/proc/togglehubvisibility //toggles visibility on the BYOND Hub
 	)
 var/list/admin_verbs_debug = list(
 	/client/proc/getruntimelog,                     // allows us to access runtime logs to somebody,
@@ -208,7 +208,6 @@ var/list/admin_verbs_debug = list(
 	/client/proc/dsay,
 	/client/proc/toggle_recursive_explosions,
 	/client/proc/restart_sql,
-	/client/proc/debug_pooling,
 	/client/proc/fix_player_list,
 	/client/proc/lighting_show_verbs,
 	/client/proc/restart_controller,
@@ -275,7 +274,6 @@ var/list/admin_verbs_hideable = list(
 	/client/proc/toggle_random_events,
 	/client/proc/cmd_admin_add_random_ai_law,
 	/client/proc/Set_Holiday,
-	/client/proc/ToRban,
 	/datum/admins/proc/startnow,
 	/datum/admins/proc/restart,
 	/datum/admins/proc/delay,
@@ -305,8 +303,7 @@ var/list/admin_verbs_hideable = list(
 	/client/proc/roll_dices,
 	/proc/possess,
 	/proc/release,
-	/client/proc/toggle_recursive_explosions,
-	/client/proc/debug_pooling
+	/client/proc/toggle_recursive_explosions
 	)
 var/list/admin_verbs_mod = list(
 	/client/proc/cmd_admin_pm_context,	// right-click adminPM interface,
@@ -1109,14 +1106,22 @@ var/list/admin_verbs_cciaa = list(
 
 	SSopenturf.hard_reset()
 
+<<<<<<< HEAD
 /client/proc/set_global_view_dir()
 	set category = "Fun"
 	set name = "Set Global View Direction"
 	set desc = "Forcibly sets everyone's view direction and prevents them from changing it."
+=======
+/client/proc/apply_sunstate()
+	set category = "Fun"
+	set name = "Apply Sun Preset"
+	set desc = "Changes the sun preset. This takes a long time to apply, use sparingly!"
+>>>>>>> upstream/development
 
 	if (!check_rights(R_FUN))
 		return
 
+<<<<<<< HEAD
 	var/static/list/valid_dirs = list(
 		"NORTH (default)" = NORTH,
 		"SOUTH" = SOUTH,
@@ -1149,3 +1154,11 @@ var/list/admin_verbs_cciaa = list(
 				continue
 
 			M.client.set_dir()	// null args sets to the global dir.
+=======
+	var/datum/sun_state/S = input("Choose a preset to apply:", "ILLUMINATE") as null|anything in SSsunlight.presets
+	if (!S)
+		to_chat(usr, "Cancelled.")
+
+	SSsunlight.apply_sun_state(S)
+	log_and_message_admins("has set the sun state to '[S]'.")
+>>>>>>> upstream/development

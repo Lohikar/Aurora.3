@@ -9,6 +9,7 @@
 
 	var/launch_time			//the time at which the shuttle will be launched
 	var/wait_for_launch = 0	//if the shuttle is waiting to launch
+	var/failreturnnumber = 0 // the number of times the shuttle failed to leave the station
 	var/list/current_mobs = list()
 
 /datum/controller/subsystem/arrivals/New()
@@ -37,10 +38,9 @@
 	if (!shuttle.location)
 		return
 
-	log_debug("SSarrivals: [M] has entered arrival shuttle hotzone.")
 
 	if (istype(M))
-		current_mobs += "\ref[M]"
+		current_mobs += SOFTREF(M)
 
 	wake()	// Wake the process.
 
@@ -48,8 +48,7 @@
 		set_launch_countdown(30)
 
 /datum/controller/subsystem/arrivals/proc/on_hotzone_exit(mob/living/M)
-	current_mobs -= "\ref[M]"
-	log_debug("SSarrivals: [M] has exited arrival shuttle hotzone.")
+	current_mobs -= SOFTREF(M)
 
 //called when the shuttle has arrived.
 
