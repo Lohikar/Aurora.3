@@ -73,7 +73,7 @@ var/datum/controller/subsystem/lighting/SSlighting
 			if (!A.dynamic_lighting)
 				continue
 
-			new /atom/movable/lighting_overlay(T)
+			new /atom/movable/lighting/multiplier(T)
 			overlaycount++
 
 			CHECK_TICK
@@ -156,7 +156,7 @@ var/datum/controller/subsystem/lighting/SSlighting
 		MC_SPLIT_TICK
 
 	while (oq_idex <= curr_overlays.len)
-		var/atom/movable/lighting_overlay/O = curr_overlays[oq_idex++]
+		var/atom/movable/lighting/O = curr_overlays[oq_idex++]
 
 		if (O.needs_update)
 			O.update_overlay()
