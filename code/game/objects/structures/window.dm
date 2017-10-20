@@ -22,6 +22,11 @@
 
 	atmos_canpass = CANPASS_PROC
 
+/obj/structure/window/tinttest
+	name = "stained window"
+	desc = "It's a window. Exciting."
+	color = "#FF0000"
+
 /obj/structure/window/examine(mob/user)
 	. = ..(user)
 
@@ -353,6 +358,39 @@
 	update_nearby_tiles(need_rebuild=1)
 	update_nearby_icons()
 
+	if (color)
+		update_turftint(null)
+
+/obj/structure/window/proc/update_turftint(turf/oldloc, no_apply)
+	if (oldloc)
+		oldloc.tinted_dirs[dir] = null
+		var/all_null = TRUE
+		for (var/thing in oldloc.tinted_dirs)
+			if (thing)
+				all_null = FALSE
+				break
+
+		if (all_null)
+		oldloc.tinted_dirs = null
+
+	if (isturf(loc) && !no_apply)
+		var/turf/T = loc
+		if (!T.tinted_dirs)
+			T.tinted_dirs = new /list(NORTH|SOUTH|EAST|WEST)
+
+		T.tinted_dirs[dir] = color
+
+/obj/structure/window/Move()
+	var/oldloc = loc
+	. = ..()
+	if (. = color)
+		update_turftint(oldloc)
+
+/obj/structure/window/forceMove()
+	var/oldloc = loc
+	. = ..()
+	if (. && color)
+		update_turftint(oldloc)
 
 /obj/structure/window/Destroy()
 	density = 0
@@ -362,8 +400,8 @@
 	for(var/obj/structure/window/W in orange(location, 1))
 		W.update_icon()
 	loc = location
+	update_turftint(loc, TRUE)
 	return ..()
-
 
 /obj/structure/window/Move()
 	var/ini_dir = dir

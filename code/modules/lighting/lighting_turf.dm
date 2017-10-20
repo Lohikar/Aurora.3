@@ -9,6 +9,7 @@
 	var/tmp/list/datum/lighting_corner/corners
 	var/tmp/has_opaque_atom = FALSE // Not to be confused with opacity, this will be TRUE if there's any opaque atom on the tile.
 	var/tmp/list/lighting_sublights
+	var/tmp/list/tinted_dirs
 
 // Causes any affecting light sources to be queued for a visibility update, for example a door got opened.
 /turf/proc/reconsider_lights()
@@ -208,6 +209,7 @@
 	var/list/old_corners = corners
 	var/old_ao_neighbors = ao_neighbors
 	var/list/old_sublights = lighting_sublights
+	var/list/old_tinted_dirs = tinted_dirs
 
 	. = ..()
 
@@ -218,10 +220,11 @@
 	if (lighting_overlay && lighting_overlay.loc != src)
 		// This is a hack, but I can't figure out why the fuck they're not on the correct turf in the first place.
 		lighting_overlay.forceMove(src, harderforce = TRUE)
-		
+
 	affecting_lights = old_affecting_lights
 	corners = old_corners
 	lighting_sublights = old_sublights
+	tinted_dirs = old_tinted_dirs
 
 	if ((old_opacity != opacity) || (dynamic_lighting != old_dynamic_lighting) || force_lighting_update)
 		reconsider_lights()

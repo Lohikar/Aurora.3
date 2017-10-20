@@ -440,9 +440,9 @@
 				corners[Tcorners[3]] = 0
 				corners[Tcorners[4]] = 0
 
-		if (T.has_tinted_object)
+		if (T.tinted_dirs)
 			var/tdir = get_dir(source_turf, T)
-			var/color = T.tinted_objects[tdir]
+			var/color = T.tinted_dirs[tdir]
 			if (color)
 				// Exclude all turfs in this direction since we don't want to affect them more than once.
 				LAZYINITLIST(exclude_turfs)
