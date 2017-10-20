@@ -8,6 +8,7 @@
 	var/tmp/atom/movable/lighting_overlay/lighting_overlay // Our lighting overlay.
 	var/tmp/list/datum/lighting_corner/corners
 	var/tmp/has_opaque_atom = FALSE // Not to be confused with opacity, this will be TRUE if there's any opaque atom on the tile.
+	var/tmp/list/lighting_sublights
 
 // Causes any affecting light sources to be queued for a visibility update, for example a door got opened.
 /turf/proc/reconsider_lights()
@@ -206,6 +207,7 @@
 	var/old_lighting_overlay = lighting_overlay
 	var/list/old_corners = corners
 	var/old_ao_neighbors = ao_neighbors
+	var/list/old_sublights = lighting_sublights
 
 	. = ..()
 
@@ -219,6 +221,7 @@
 		
 	affecting_lights = old_affecting_lights
 	corners = old_corners
+	lighting_sublights = old_sublights
 
 	if ((old_opacity != opacity) || (dynamic_lighting != old_dynamic_lighting) || force_lighting_update)
 		reconsider_lights()
@@ -231,3 +234,11 @@
 
 	for (var/turf/space/S in RANGE_TURFS(1, src))
 		S.update_starlight()
+
+/turf/proc/create_sublight(datum/light_source/parent, list/targetturfs, color_override)
+	if (!parent)
+		CRASH("Attempted to create sublight without parent!")
+
+	var/datum/light_source/sublight/S = new(parent, targetturfs, color_override)
+	LAZYSET(lighting_sublights, parent, S)
+	return S

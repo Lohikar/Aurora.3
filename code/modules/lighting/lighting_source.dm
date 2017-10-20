@@ -24,6 +24,8 @@
 	var/tmp/applied_lum_b
 	var/tmp/applied_lum_u
 
+	var/list/sublights	// Child sublights.
+
 	// Variables used to keep track of the atom's angle.
 	var/tmp/limit_a_x       // The first test point's X coord for the cone.
 	var/tmp/limit_a_y       // The first test point's Y coord for the cone.
@@ -76,6 +78,10 @@
 	SSlighting.total_lighting_sources--
 
 	remove_lum()
+	if (sublights)
+		for (var/thing in sublights)
+			qdel(thing)
+
 	if (source_atom)
 		LAZYREMOVE(source_atom.light_sources, src)
 
@@ -248,6 +254,45 @@
 
 	UNSETEMPTY(effect_str)
 
+/proc/wedge_filter_turflist(turf/origin, list/turflist, angle, dir, cutoff = 100)
+	if (!origin)
+		CRASH("Origin cannot be null.")
+	if (!angle)
+		return turflist.Copy()
+	
+	var/limit_a_t
+	var/limit_b_t
+
+	switch (dir)
+		if (NORTH)
+			limit_a_t = angle + 90
+			limit_b_t = -(angle) + 90
+
+		if (SOUTH)
+			limit_a_t = (angle) - 90
+			limit_b_t = -(angle) - 90
+
+		if (EAST)
+			limit_a_t = angle
+			limit_b_t = -(angle)
+
+		if (WEST)
+			limit_a_t = angle + 180
+			limit_b_t = -(angle) - 180
+
+	var/limit_a_x = POLAR_TO_CART_X(cutoff, limit_a_t)
+	var/limit_a_y = POLAR_TO_CART_Y(cutoff, limit_a_t)
+	var/limit_b_x = POLAR_TO_CART_X(cutoff, limit_b_t)
+	var/limit_b_y = POLAR_TO_CART_Y(cutoff, limit_b_t)
+
+	. = list()
+	for (var/thing in turflist)
+		var/turf/T = thing
+		if ((PSEUDO_WEDGE(limit_a_x, limit_a_y, T.x, T.y) > 0) || (PSEUDO_WEDGE(T.x, T.y, limit_b_x, limit_b_y) > 0))
+			continue
+
+		.[T] = TRUE
+
 // If you update this, update the equivalent proc in lighting_source_novis.dm.
 /datum/light_source/proc/update_corners(now = FALSE)
 	var/update = FALSE
@@ -351,6 +396,9 @@
 	var/actual_range = (light_angle && facing_opaque) ? light_range * LIGHTING_BLOCKED_FACTOR : light_range
 	var/test_x
 	var/test_y
+	var/list/exclude_turfs
+	var/list/subturfs
+	var/datum/light_source/sublight/sublight
 
 	var/zlights_going_up = FALSE
 	var/turf/originalT	// This is needed to reset our search point for bidirectional Z-lights.
@@ -359,6 +407,9 @@
 		T = originalT
 		zlights_going_up = FALSE
 		check_t:
+
+		if (exclude_turfs && exclude_turfs[T])
+			continue
 
 		if (light_angle && !facing_opaque)	// Directional lighting coordinate filter.
 			test_x = T.x - test_x_offset
@@ -389,7 +440,29 @@
 				corners[Tcorners[3]] = 0
 				corners[Tcorners[4]] = 0
 
-		turfs += T
+		if (T.has_tinted_object)
+			var/tdir = get_dir(source_turf, T)
+			var/color = T.tinted_objects[tdir]
+			if (color)
+				// Exclude all turfs in this direction since we don't want to affect them more than once.
+				LAZYINITLIST(exclude_turfs)
+				subturfs = wedge_filter_turflist(T, turfs, 90)
+				exclude_turfs += subturfs
+				if (T.lighting_sublights && T.lighting_sublights[src])
+					sublight = T.lighting_sublights[src]
+					if (sublight.raw_color != light_color)
+						sublight.set_color(multiply_color(light_color, color), TRUE)
+					sublight.update_targets(subturfs)
+				else
+					sublights += T.create_sublight(src, subturfs, multiply_color(light_color, color))
+			else
+				turfs += T
+		else
+			turfs += T
+			if (T.lighting_sublights && T.lighting_sublights[src])
+				sublight = T.lighting_sublights[src]
+				qdel(sublight)	// Destroy should clean up the turf var.
+				sublights -= sublight
 
 		// Note: above is defined on ALL turfs, but below is only defined on OPEN TURFS.
 
@@ -408,6 +481,8 @@
 				goto zlight_check
 
 	END_FOR_DVIEW
+
+	turfs -= exclude_turfs
 
 	LAZYINITLIST(affecting_turfs)
 
@@ -472,3 +547,17 @@
 #undef DO_UPDATE
 #undef INTELLIGENT_UPDATE
 #undef PSEUDO_WEDGE
+
+/proc/multiply_color(color1, color2)
+	if (!color1 || !color2)
+		return "#000000"
+
+	var/r1 = GetRedPart(color1)
+	var/g1 = GetGreenPart(color1)
+	var/b1 = GetBluePart(color1)
+
+	var/r2 = GetRedPart(color2)
+	var/g2 = GetGreenPart(color2)
+	var/b2 = GetBluePart(color2)
+
+	return rgb(r1*r2, g1*g2, b1*b2)
