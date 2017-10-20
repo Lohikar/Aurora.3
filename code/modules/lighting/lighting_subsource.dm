@@ -127,8 +127,9 @@
 	var/Sz = source_turf.z
 	var/corner_height = LIGHTING_HEIGHT
 	var/actual_range = (light_angle && facing_opaque) ? light_range * LIGHTING_BLOCKED_FACTOR : light_range
-	var/test_x
-	var/test_y
+	var/list/exclude_turfs
+	var/list/subturfs
+	var/datum/light_source/sublight/sublight
 
 	var/zlights_going_up = FALSE
 	var/turf/originalT	// This is needed to reset our search point for bidirectional Z-lights.
@@ -159,9 +160,9 @@
 				corners[Tcorners[3]] = 0
 				corners[Tcorners[4]] = 0
 
-		if (T.has_tinted_object)
+		if (T.tinted_dirs)
 			var/tdir = get_dir(source_turf, T)
-			var/color = T.tinted_objects[tdir]
+			var/color = T.tinted_dirs[tdir]
 			if (color)
 				// Exclude all turfs in this direction since we don't want to affect them more than once.
 				LAZYINITLIST(exclude_turfs)

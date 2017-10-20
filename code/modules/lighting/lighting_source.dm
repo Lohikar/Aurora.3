@@ -212,8 +212,6 @@
 	limit_b_y = MINMAX(limit_b_y)
 
 #undef ARBITRARY_NUMBER
-#undef POLAR_TO_CART_X
-#undef POLAR_TO_CART_Y
 #undef MINMAX
 
 /datum/light_source/proc/remove_lum(now = FALSE)
@@ -547,6 +545,8 @@
 #undef DO_UPDATE
 #undef INTELLIGENT_UPDATE
 #undef PSEUDO_WEDGE
+#undef POLAR_TO_CART_X
+#undef POLAR_TO_CART_Y
 
 /proc/multiply_color(color1, color2)
 	if (!color1 || !color2)
