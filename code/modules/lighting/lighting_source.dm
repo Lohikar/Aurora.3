@@ -552,12 +552,12 @@
 	if (!color1 || !color2)
 		return "#000000"
 
-	var/r1 = GetRedPart(color1)
-	var/g1 = GetGreenPart(color1)
-	var/b1 = GetBluePart(color1)
+	var/r1 = GetRedPart(color1)/255
+	var/g1 = GetGreenPart(color1)/255
+	var/b1 = GetBluePart(color1)/255
 
-	var/r2 = GetRedPart(color2)
-	var/g2 = GetGreenPart(color2)
-	var/b2 = GetBluePart(color2)
+	var/r2 = GetRedPart(color2)/255
+	var/g2 = GetGreenPart(color2)/255
+	var/b2 = GetBluePart(color2)/255
 
-	return rgb(r1*r2, g1*g2, b1*b2)
+	return rgb(r1*r2*255, g1*g2*255, b1*b2*255)
