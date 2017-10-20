@@ -1411,6 +1411,7 @@
 #include "code\modules\lighting\lighting_overlay.dm"
 #include "code\modules\lighting\lighting_profiler.dm"
 #include "code\modules\lighting\lighting_source.dm"
+#include "code\modules\lighting\lighting_subsource.dm"
 #include "code\modules\lighting\lighting_source_sunlight.dm"
 #include "code\modules\lighting\lighting_turf.dm"
 #include "code\modules\lighting\lighting_verbs.dm"

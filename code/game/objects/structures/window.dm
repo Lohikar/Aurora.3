@@ -371,7 +371,7 @@
 				break
 
 		if (all_null)
-		oldloc.tinted_dirs = null
+			oldloc.tinted_dirs = null
 
 	if (isturf(loc) && !no_apply)
 		var/turf/T = loc
@@ -383,7 +383,7 @@
 /obj/structure/window/Move()
 	var/oldloc = loc
 	. = ..()
-	if (. = color)
+	if (. == color)
 		update_turftint(oldloc)
 
 /obj/structure/window/forceMove()
