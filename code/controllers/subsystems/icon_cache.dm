@@ -2,7 +2,8 @@
 
 /datum/controller/subsystem/icon_cache
 	name = "Icon Cache"
-	flags = SS_NO_FIRE | SS_NO_INIT
+	flags = SS_NO_FIRE
+	init_order = SS_INIT_MISC_FIRST
 
 	// Cached bloody overlays, key is object type.
 	var/list/bloody_cache = list()
@@ -63,8 +64,17 @@
 
 	var/list/ao_cache = list()
 
+	var/list/pipe_cache = list()
+
 /datum/controller/subsystem/icon_cache/New()
 	NEW_SS_GLOBAL(SSicon_cache)
+	setup_atmos_cache()
+
+/datum/controller/subsystem/icon_cache/Initialize()
+	setup_collar_mappings()
+	setup_uniform_mappings()
+	setup_atmos_cache()
+	..()
 
 /datum/controller/subsystem/icon_cache/proc/setup_collar_mappings()
 	collar_states = list()
@@ -85,3 +95,22 @@
 	uniform_states = list()
 	for (var/i in icon_states('icons/mob/uniform.dmi'))
 		uniform_states[i] = TRUE
+
+/datum/controller/subsystem/icon_cache/proc/setup_atmos_cache()
+	var/icon/junct_bracket = new('icons/atmos/manifold.dmi')
+	var/list/bracket_states = list("clamps", "clamps_4way")
+	var/list/bracket_variants = list("", "-scrubbers", "-supply")
+	for (var/color_name in global.pipe_colors)
+		var/color = global.pipe_colors[color_name]
+		var/icon/pipe_icon = new('icons/atmos/pipes.dmi')
+		pipe_icon.Blend(color, ICON_MULTIPLY)
+		pipe_cache["[color]"] = pipe_icon
+
+		var/icon/junction_icon = new('icons/atmos/manifold_tint.dmi')
+		junction_icon.Blend(color, ICON_MULTIPLY)
+
+		for (var/state in bracket_states)
+			for (var/variant in bracket_variants)
+				junction_icon.Insert(junct_bracket, "[state][variant]")
+
+		pipe_cache["manifold[color]"] = junction_icon

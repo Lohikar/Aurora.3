@@ -29,6 +29,7 @@ Pipelines + Other Objects -> Pipe network
 	var/obj/machinery/atmospherics/node1
 	var/obj/machinery/atmospherics/node2
 	gfi_layer_rotation = GFI_ROTATION_OVERDIR
+	var/atmos_lateload = TRUE
 
 /obj/machinery/atmospherics/Initialize(mapload)
 	. = ..()
@@ -37,20 +38,25 @@ Pipelines + Other Objects -> Pipe network
 
 	if(!pipe_color)
 		pipe_color = color
+
 	color = null
 
 	if(!pipe_color_check(pipe_color))
 		pipe_color = null
 
 	if (mapload)
-		return INITIALIZE_HINT_LATELOAD
+		if (atmos_lateload)
+			return INITIALIZE_HINT_LATELOAD
+		else
+			atmos_init()
 
 /obj/machinery/atmospherics/proc/atmos_init()
 
 // atmos_init() and Initialize() must be separate, as atmos_init() can be called multiple times after the machine has been initialized.
 
 /obj/machinery/atmospherics/LateInitialize()
-	atmos_init()
+	if (atmos_lateload)
+		atmos_init()
 
 /obj/machinery/atmospherics/attackby(atom/A, mob/user as mob)
 	if(istype(A, /obj/item/device/pipe_painter))

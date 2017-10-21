@@ -14,13 +14,16 @@
 	thermal_conductivity = OPEN_HEAT_TRANSFER_COEFFICIENT
 
 	buckle_lying = 1
+	atmos_lateload = TRUE
+	icon_type = "hepipe"
 
-	// BubbleWrap
 /obj/machinery/atmospherics/pipe/simple/heat_exchanging/Initialize()
-	. = ..()
 	initialize_directions_he = initialize_directions	// The auto-detection from /pipe is good enough for a simple HE pipe
-// BubbleWrap END
 	color = "#404040" //we don't make use of the fancy overlay system for colours, use this to set the default.
+	. = ..()
+
+/obj/machinery/atmospherics/pipe/simple/heat_exchanging/set_icon()
+	return
 
 /obj/machinery/atmospherics/pipe/simple/heat_exchanging/atmos_init()
 	normalize_dir()

@@ -15,13 +15,22 @@
 	buckle_require_restraints = 1
 	buckle_lying = -1
 
+	var/icon_type
+
+/obj/machinery/atmospherics/proc/set_icon()
+
+/obj/machinery/atmospherics/pipe/set_icon()
+	icon = SSicon_cache.pipe_cache["[icon_type][pipe_color || PIPE_COLOR_GREY]"]
+
 /obj/machinery/atmospherics/pipe/drain_power()
 	return -1
 
 /obj/machinery/atmospherics/pipe/Initialize()
 	if(istype(get_turf(src), /turf/simulated/wall) || istype(get_turf(src), /turf/simulated/shuttle/wall) || istype(get_turf(src), /turf/unsimulated/wall))
 		level = 1
+
 	. = ..()
+	set_icon()
 
 /obj/machinery/atmospherics/pipe/hides_under_flooring()
 	return level != 2
@@ -115,6 +124,7 @@
 		return
 
 	pipe_color = new_color
+	set_icon()
 	update_icon()
 
 /*
@@ -151,7 +161,7 @@
 	icon_state = ""
 	var/pipe_icon = "" //what kind of pipe it is and from which dmi is the icon manager getting its icons, "" for simple pipes, "hepipe" for HE pipes, "hejunction" for HE junctions
 	name = "pipe"
-	desc = "A one meter section of regular pipe"
+	desc = "A one meter section of regular pipe."
 
 	volume = ATMOS_DEFAULT_VOLUME_PIPE
 
@@ -253,9 +263,6 @@
 		node2.update_underlays()
 
 /obj/machinery/atmospherics/pipe/simple/update_icon(var/safety = 0)
-	if(!check_icon_cache())
-		return
-
 	alpha = 255
 
 	cut_overlays()
@@ -269,9 +276,13 @@
 				qdel(meter)
 		qdel(src)
 	else if(node1 && node2)
-		add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "[pipe_icon]intact[icon_connect_type]"))
+		icon_state = "intact[icon_connect_type]"
+//		add_overlay("intact[icon_connect_type]")
+		//add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "[pipe_icon]intact[icon_connect_type]"))
 	else
-		add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "[pipe_icon]exposed[node1?1:0][node2?1:0][icon_connect_type]"))
+		icon_state = "exposed[!!node1][!!node2][icon_connect_type]"
+		//add_overlay("exposed[!!node1][!!node2][icon_connect_type]")
+//		add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "[pipe_icon]exposed[node1?1:0][node2?1:0][icon_connect_type]"))
 
 /obj/machinery/atmospherics/pipe/simple/update_underlays()
 	return
@@ -434,10 +445,11 @@
 	layer = 2.4 //under wires with their 2.44
 
 	gfi_layer_rotation = GFI_ROTATION_OVERDIR
+	icon_type = "manifold"
 
 /obj/machinery/atmospherics/pipe/manifold/Initialize()
 	alpha = 255
-	icon = null
+	icon_state = null
 
 	switch(dir)
 		if(NORTH)
@@ -524,8 +536,10 @@
 		qdel(src)
 	else
 		cut_overlays()
-		add_overlay(icon_manager.get_atmos_icon("manifold", , pipe_color, "core" + icon_connect_type))
-		add_overlay(icon_manager.get_atmos_icon("manifold", , , "clamps" + icon_connect_type))
+		icon_state = "core[icon_connect_type]"
+		//add_overlay("core[icon_connect_type ? "-[icon_connect_type]" : ""]")
+//		add_overlay(icon_manager.get_atmos_icon("manifold", , pipe_color, "core" + icon_connect_type))
+		add_overlay("clamps[icon_connect_type]")
 
 		// Can't handle underlays with SSoverlay.
 		underlays.Cut()
@@ -779,8 +793,10 @@
 		qdel(src)
 	else
 		cut_overlays()
-		add_overlay(icon_manager.get_atmos_icon("manifold", , pipe_color, "4way" + icon_connect_type))
-		add_overlay(icon_manager.get_atmos_icon("manifold", , , "clamps_4way" + icon_connect_type))
+		icon_state = "4way[icon_connect_type]"
+//		add_overlay(icon_manager.get_atmos_icon("manifold", , pipe_color, "4way" + icon_connect_type))
+		add_overlay("clamps_4way[icon_connect_type]")		
+//		add_overlay(icon_manager.get_atmos_icon("manifold", , , "clamps_4way" + icon_connect_type))
 
 		underlays.Cut()
 
@@ -1001,8 +1017,8 @@
 
 	alpha = 255
 
-	cut_overlays()
-	add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "cap"))
+	icon_state = "cap"
+	//add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "cap"))
 
 /obj/machinery/atmospherics/pipe/cap/atmos_init()
 	for(var/obj/machinery/atmospherics/target in get_step(src, dir))
@@ -1080,6 +1096,9 @@
 	icon_state = "air"
 	initialize_directions = dir
 	. = ..()
+
+/obj/machinery/atmospherics/pipe/tank/set_icon()
+	return
 
 /obj/machinery/atmospherics/pipe/tank/machinery_process()
 	if(!parent)
@@ -1321,8 +1340,8 @@
 
 	alpha = 255
 
-	cut_overlays()
-	add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "universal"))
+	icon_state = "universal"
+	//add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "universal"))
 	underlays.Cut()
 
 	if (node1)
@@ -1357,8 +1376,8 @@
 
 	alpha = 255
 
-	cut_overlays()
-	add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "universal"))
+	icon_state = "universal"
+	//add_overlay(icon_manager.get_atmos_icon("pipe", , pipe_color, "universal"))
 
 	underlays.Cut()
 
