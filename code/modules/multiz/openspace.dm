@@ -158,3 +158,20 @@
 /atom/movable/openspace/overlay/proc/owning_turf_changed()
 	if (!destruction_timer)
 		destruction_timer = addtimer(CALLBACK(GLOBAL_PROC, /proc/qdel, src), 10 SECONDS, TIMER_STOPPABLE)
+
+/turf/proc/get_vertically_adjacent_turfs()
+	. = list(src)
+	if (!HasBelow(z) && !HasAbove(z))
+		return
+
+	var/turf/T = src
+	while (istype(T.above))
+		T = T.above
+		. += T
+
+/turf/simulated/open/get_vertically_adjacent_turfs()
+	. = ..()
+	var/turf/simulated/open/T = src
+	while (istype(T) && T.below)
+		T = T.below
+		. += T

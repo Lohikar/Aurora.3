@@ -58,8 +58,12 @@
 	var/list/messageturfs = list()//List of turfs we broadcast to.
 	var/list/messagemobs = list()//List of living mobs nearby who can hear it, and distant ghosts who've chosen to hear it
 	var/list/messagemobs_neardead = list()//List of nearby ghosts who can hear it. Those that qualify ONLY go in this list
-	for (var/turf in view(world.view, get_turf(src)))
-		messageturfs += turf
+
+	var/turf/T = get_turf(src)
+
+	for (var/thing in T.get_vertically_adjacent_turfs())
+		for (var/turf in view(world.view, get_turf(src)))
+			messageturfs += turf
 
 	for(var/mob/M in player_list)
 		if (!M.client || istype(M, /mob/new_player))
@@ -82,5 +86,3 @@
 
 	for (var/mob/O in messagemobs_neardead)
 		O.show_message(message, type)
-
-

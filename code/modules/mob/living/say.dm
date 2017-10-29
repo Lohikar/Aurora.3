@@ -237,9 +237,11 @@ proc/get_radio_key_from_channel(var/channel)
 
 	var/list/listening = list()
 	var/list/listening_obj = list()
-	var/turf/T = get_turf(src)
+	var/turf/sourceT = get_turf(src)
+	var/turf/T
 
-	if(T)
+	for (var/thing in sourceT.get_vertically_adjacent_turfs())
+		T = thing
 		//make sure the air can transmit speech - speaker's side
 		var/datum/gas_mixture/environment = T.return_air()
 		var/pressure = (environment)? environment.return_pressure() : 0
@@ -252,7 +254,6 @@ proc/get_radio_key_from_channel(var/channel)
 
 		get_mobs_and_objs_in_view_fast(T, message_range, listening, listening_obj)
 
-
 	var/list/hear_clients = list()
 	for(var/mob/M in listening)
 		M.hear_say(message, verb, speaking, alt_name, italics, src, speech_sound, sound_vol)
@@ -264,9 +265,7 @@ proc/get_radio_key_from_channel(var/channel)
 	INVOKE_ASYNC(GLOBAL_PROC, /proc/flick_overlay, speech_bubble, hear_clients, 30)
 
 	for(var/obj/O in listening_obj)
-		spawn(0)
-			if(O) //It's possible that it could be deleted in the meantime.
-				O.hear_talk(src, message, verb, speaking)
+		INVOKE_ASYNC(O, /obj/.proc/hear_talk, src, message, verb, speaking)
 
 	log_say("[key_name(src)] : ([get_lang_name(speaking)]) [message]",ckey=key_name(src))
 	return 1
@@ -274,8 +273,13 @@ proc/get_radio_key_from_channel(var/channel)
 /mob/living/proc/say_signlang(var/message, var/verb="gestures", var/datum/language/language)
 	log_say("[key_name(src)] : ([get_lang_name(language)]) [message]",ckey=key_name(src))
 
-	for (var/mob/O in viewers(src, null))
-		O.hear_signlang(message, verb, language, src)
+	if (bound_overlay && isopenturf(bound_overlay.loc))	// If we're visible, show messages here too.
+		for (var/thing in get_above_oo() + src)
+			for (var/mob/O in viewers(thing))
+				O.hear_signlang(message, verb, language, src)
+	else
+		for (var/mob/O in viewers(src, null))
+			O.hear_signlang(message, verb, language, src)
 	return 1
 
 /obj/effect/speech_bubble

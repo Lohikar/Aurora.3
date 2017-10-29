@@ -401,6 +401,11 @@
 		else if(blind_message)
 			M.show_message(blind_message, 2)
 
+/atom/movable/visible_message(message, blind_message, range = world.view)
+	. = ..()
+	if (bound_overlay)
+		bound_overlay.visible_message(arglist(args))
+
 // Show a message to all mobs and objects in earshot of this atom
 // Use for objects performing audible actions
 // message is the message output to anyone who can hear.
@@ -422,6 +427,11 @@
 	for(var/o in objs)
 		var/obj/O = o
 		O.show_message(message,2,deaf_message,1)
+
+/atom/movable/audible_message(message, deaf_message, hearing_distance)
+	. = ..()
+	if (bound_overlay)
+		bound_overlay.audible_message(arglist(args))
 
 /atom/proc/change_area(var/area/oldarea, var/area/newarea)
 	change_area_name(oldarea.name, newarea.name)
