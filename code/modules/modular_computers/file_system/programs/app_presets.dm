@@ -74,7 +74,26 @@
 		new/datum/computer_file/program/filemanager(),
 		new/datum/computer_file/program/chatclient(),
 		new/datum/computer_file/program/card_mod(),
-		new/datum/computer_file/program/comm()
+		new/datum/computer_file/program/comm(1)
+	)
+	return _prg_list
+
+/datum/modular_computer_app_presets/captain
+	name = "captain"
+	display_name = "Captain"
+	description = "Contains the most important programs for the Captain."
+	available = 0
+/datum/modular_computer_app_presets/captain/return_install_programs()
+	var/list/_prg_list = list(
+		new/datum/computer_file/program/filemanager(),
+		new/datum/computer_file/program/chatclient(),
+		new/datum/computer_file/program/card_mod(),
+		new/datum/computer_file/program/comm(1,1),
+		new/datum/computer_file/program/camera_monitor(),
+		new/datum/computer_file/program/digitalwarrant(),
+		new/datum/computer_file/program/civilian/cargocontrol(),
+		new/datum/computer_file/program/civilian/cargoorder(),
+		new/datum/computer_file/program/alarm_monitor()
 	)
 	return _prg_list
 
@@ -159,7 +178,7 @@
 		new/datum/computer_file/program/filemanager(),
 		new/datum/computer_file/program/ntnetdownload(),
 		new/datum/computer_file/program/camera_monitor/hacked(),
-		new/datum/computer_file/program/comm(),
+		new/datum/computer_file/program/comm(1),
 		new/datum/computer_file/program/suit_sensors(),
 		new/datum/computer_file/program/alarm_monitor(),
 		new/datum/computer_file/program/lighting_control(),

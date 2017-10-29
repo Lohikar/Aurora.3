@@ -13,8 +13,6 @@
 	if(embedded_flag)
 		handle_embedded_objects() //Moving with objects stuck in you can cause bad times.
 
-
-
 	var/health_deficiency = (100 - health)
 	if(health_deficiency >= 40) tally += (health_deficiency / 25)
 
@@ -74,9 +72,11 @@
 	if(tally > 0 && (CE_SPEEDBOOST in chem_effects))
 		tally = max(0, tally-3)
 
+	var/turf/T = get_turf(src)
+	if(T)
+		tally += T.movement_cost
+
 	return (tally+config.human_delay)
-
-
 
 
 /mob/living/carbon/human/Allow_Spacemove(var/check_drift = 0)
@@ -123,11 +123,11 @@
 		last_x = x
 		last_y = y
 		if (m_intent == "run")
-			playsound(src, T.footstep_sound, 70, 1)
+			playsound(src, T.footstep_sound, 70, 1, is_footstep = TRUE)
 		else
 			footstep++
 			if (footstep % 2)
-				playsound(src, T.footstep_sound, 40, 1)
+				playsound(src, T.footstep_sound, 40, 1, is_footstep = TRUE)
 
 /mob/living/carbon/human/mob_has_gravity()
 	. = ..()
