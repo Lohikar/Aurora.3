@@ -43,6 +43,9 @@
 	canSmoothWith = null
 	permit_ao = TRUE
 
+/turf/simulated/shuttle/wall/titanium
+	icon = 'icons/turf/smooth/plastitanium_wall.dmi'
+
 /turf/simulated/shuttle/floor
 	name = "floor"
 	icon_state = "floor"

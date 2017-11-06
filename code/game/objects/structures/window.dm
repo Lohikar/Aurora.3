@@ -497,6 +497,13 @@
 	smooth = SMOOTH_TRUE
 	can_be_unanchored = TRUE
 
+/obj/structure/window/shuttle/dark
+	name = "armored shuttle window"
+	desc = "It looks very strong. Might take a lot of hits to break."
+	icon = 'icons/obj/smooth/plastitanium_window.dmi'
+	icon_state = "plastitanium_window"
+	maxhealth = 100
+
 /obj/structure/window/shuttle/crescent
 	desc = "It looks rather strong."
 
