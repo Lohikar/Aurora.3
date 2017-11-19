@@ -394,7 +394,6 @@
 	var/actual_range = (light_angle && facing_opaque) ? light_range * LIGHTING_BLOCKED_FACTOR : light_range
 	var/test_x
 	var/test_y
-	var/list/exclude_turfs
 	var/list/subturfs
 	var/datum/light_source/sublight/sublight
 
@@ -405,9 +404,6 @@
 		T = originalT
 		zlights_going_up = FALSE
 		check_t:
-
-		if (exclude_turfs && exclude_turfs[T])
-			continue
 
 		if (light_angle && !facing_opaque)	// Directional lighting coordinate filter.
 			test_x = T.x - test_x_offset
@@ -443,14 +439,14 @@
 			var/color = T.tinted_dirs[tdir]
 			if (color)
 				// Exclude all turfs in this direction since we don't want to affect them more than once.
-				LAZYINITLIST(exclude_turfs)
-				subturfs = wedge_filter_turflist(T, turfs, 90)
-				exclude_turfs += subturfs
+				LAZYSET(subturfs, T, tdir)
+				//subturfs = wedge_filter_turflist(T, turfs, 90, tdir)
+				//log_debug("[subturfs.len] subturfs for S [src]")
+				//exclude_turfs += subturfs
 				if (T.lighting_sublights && T.lighting_sublights[src])
 					sublight = T.lighting_sublights[src]
 					if (sublight.raw_color != light_color)
 						sublight.set_color(multiply_color(light_color, color), TRUE)
-					sublight.update_targets(subturfs)
 				else
 					sublights += T.create_sublight(src, subturfs, multiply_color(light_color, color))
 			else
@@ -480,7 +476,13 @@
 
 	END_FOR_DVIEW
 
-	turfs -= exclude_turfs
+	var/list/st_turfs
+	if (LAZYLEN(subturfs))
+		for (thing in sublights)
+			sublight = thing
+			st_turfs = wedge_filter_turflist(sublight.source_turf, turfs, 90, subturfs[T])
+			sublight.update_targets(st_turfs)
+			turfs -= st_turfs
 
 	LAZYINITLIST(affecting_turfs)
 

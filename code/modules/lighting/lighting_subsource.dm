@@ -4,9 +4,9 @@
 	var/targets_changed = FALSE
 	var/raw_color
 
-/datum/light_source/sublight/New(datum/light_source/parent, list/target_turfs, color_override)
+/datum/light_source/sublight/New(datum/light_source/parent, color_override)
 	src.parent = parent
-	src.target_turfs = target_turfs
+	target_turfs = list()
 	..(parent.source_atom, parent.top_atom)
 	light_color = color_override
 	parse_light_color()
@@ -20,6 +20,7 @@
 /datum/light_source/sublight/proc/update_targets(list/newtargets, defer_update)
 	target_turfs = newtargets
 	targets_changed = TRUE
+	log_debug("subsource([src]): TT changed, TT.len=>[target_turfs.len] defer=[defer_update]")
 	if (!defer_update)
 		update()
 
@@ -133,6 +134,9 @@
 
 	var/zlights_going_up = FALSE
 	var/turf/originalT	// This is needed to reset our search point for bidirectional Z-lights.
+
+	if (!target_turfs.len)
+		log_debug("sublight([src]): no targets")
 
 	for (thing in target_turfs)
 		T = originalT = thing

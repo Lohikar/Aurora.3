@@ -240,10 +240,10 @@
 	for (var/turf/space/S in RANGE_TURFS(1, src))
 		S.update_starlight()
 
-/turf/proc/create_sublight(datum/light_source/parent, list/targetturfs, color_override)
+/turf/proc/create_sublight(datum/light_source/parent,  color_override)
 	if (!parent)
 		CRASH("Attempted to create sublight without parent!")
 
-	var/datum/light_source/sublight/S = new(parent, targetturfs, color_override)
+	var/datum/light_source/sublight/S = new(parent, color_override)
 	LAZYSET(lighting_sublights, parent, S)
 	return S
