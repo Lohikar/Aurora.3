@@ -65,7 +65,7 @@ var/global/list/rad_collectors = list()
 		user.drop_item()
 		src.P = W
 		W.loc = src
-		update_icons()
+		update_icon()
 		return 1
 	else if(iscrowbar(W))
 		if(P && !src.locked)
@@ -121,7 +121,7 @@ var/global/list/rad_collectors = list()
 	if(active)
 		toggle_power()
 	else
-		update_icons()
+		update_icon()
 
 /obj/machinery/power/rad_collector/proc/receive_pulse(var/pulse_strength)
 	if(P && active)
@@ -133,7 +133,7 @@ var/global/list/rad_collectors = list()
 	return
 
 
-/obj/machinery/power/rad_collector/proc/update_icons()
+/obj/machinery/power/rad_collector/update_icon()
 	cut_overlays()
 	if(P)
 		add_overlay("ptank")
@@ -151,6 +151,4 @@ var/global/list/rad_collectors = list()
 	else
 		icon_state = "ca"
 		flick("ca_deactive", src)
-	update_icons()
-	return
-
+	update_icon()

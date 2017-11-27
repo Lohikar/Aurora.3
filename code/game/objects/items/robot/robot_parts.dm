@@ -13,8 +13,8 @@
 /obj/item/robot_parts/set_dir()
 	return
 
-/obj/item/robot_parts/New(var/newloc, var/model)
-	..(newloc)
+/obj/item/robot_parts/Initialize(mapload, model)
+	. = ..(mapload)
 	if(model_info && model)
 		model_info = model
 		var/datum/robolimb/R = all_robolimbs[model]
@@ -74,6 +74,7 @@
 	name = "endoskeleton"
 	desc = "A complex metal backbone with standard limb sockets and pseudomuscle anchors."
 	icon_state = "robo_suit"
+	update_icon_on_init = TRUE
 	var/obj/item/robot_parts/l_arm/l_arm = null
 	var/obj/item/robot_parts/r_arm/r_arm = null
 	var/obj/item/robot_parts/l_leg/l_leg = null
@@ -82,11 +83,7 @@
 	var/obj/item/robot_parts/head/head = null
 	var/created_name = ""
 
-/obj/item/robot_parts/robot_suit/Initialize()
-	. = ..()
-	src.updateicon()
-
-/obj/item/robot_parts/robot_suit/proc/updateicon()
+/obj/item/robot_parts/robot_suit/update_icon()
 	cut_overlays()
 	if(src.l_arm)
 		add_overlay("l_arm+o")
@@ -128,28 +125,28 @@
 		user.drop_item()
 		W.loc = src
 		src.l_leg = W
-		src.updateicon()
+		update_icon()
 
 	if(istype(W, /obj/item/robot_parts/r_leg))
 		if(src.r_leg)	return
 		user.drop_item()
 		W.loc = src
 		src.r_leg = W
-		src.updateicon()
+		update_icon()
 
 	if(istype(W, /obj/item/robot_parts/l_arm))
 		if(src.l_arm)	return
 		user.drop_item()
 		W.loc = src
 		src.l_arm = W
-		src.updateicon()
+		update_icon()
 
 	if(istype(W, /obj/item/robot_parts/r_arm))
 		if(src.r_arm)	return
 		user.drop_item()
 		W.loc = src
 		src.r_arm = W
-		src.updateicon()
+		update_icon()
 
 	if(istype(W, /obj/item/robot_parts/chest))
 		if(src.chest)	return
@@ -157,7 +154,7 @@
 			user.drop_item()
 			W.loc = src
 			src.chest = W
-			src.updateicon()
+			update_icon()
 		else if(!W:wires)
 			user << "<span class='warning'>You need to attach wires to it first!</span>"
 		else
@@ -169,7 +166,7 @@
 			user.drop_item()
 			W.loc = src
 			src.head = W
-			src.updateicon()
+			src.update_icon()
 		else
 			user << "<span class='warning'>You need to attach a flash to it first!</span>"
 

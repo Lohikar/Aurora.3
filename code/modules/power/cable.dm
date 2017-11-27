@@ -108,12 +108,12 @@ var/list/possible_cable_coil_colours = list(
 /obj/structure/cable/hide(var/i)
 	if(istype(loc, /turf))
 		invisibility = i ? 101 : 0
-	updateicon()
+	update_icon()
 
 /obj/structure/cable/hides_under_flooring()
 	return 1
 
-/obj/structure/cable/proc/updateicon()
+/obj/structure/cable/update_icon()
 	icon_state = "[d1]-[d2]"
 	alpha = invisibility ? 127 : 255
 
@@ -674,7 +674,7 @@ obj/structure/cable/proc/cableColor(var/colorC)
 			C.d1 = 11
 			C.d2 = dirn
 			C.add_fingerprint(user)
-			C.updateicon()
+			C.update_icon()
 
 			var/datum/powernet/PN = new()
 			PN.add_cable(C)
@@ -687,7 +687,7 @@ obj/structure/cable/proc/cableColor(var/colorC)
 			D.d1 = 12
 			D.d2 = 0
 			D.add_fingerprint(user)
-			D.updateicon()
+			D.update_icon()
 
 			PN.add_cable(D)
 			D.mergeConnectedNetworksOnTurf()
@@ -708,7 +708,7 @@ obj/structure/cable/proc/cableColor(var/colorC)
 			C.d1 = 0 //it's a O-X node cable
 			C.d2 = dirn
 			C.add_fingerprint(user)
-			C.updateicon()
+			C.update_icon()
 
 			//create a new powernet with the cable, if needed it will be merged later
 			var/datum/powernet/PN = new()
@@ -772,7 +772,7 @@ obj/structure/cable/proc/cableColor(var/colorC)
 			NC.d1 = 0
 			NC.d2 = fdirn
 			NC.add_fingerprint()
-			NC.updateicon()
+			NC.update_icon()
 
 			//create a new powernet with the cable, if needed it will be merged later
 			var/datum/powernet/newPN = new()
@@ -819,7 +819,7 @@ obj/structure/cable/proc/cableColor(var/colorC)
 		C.d2 = nd2
 
 		C.add_fingerprint()
-		C.updateicon()
+		C.update_icon()
 
 
 		C.mergeConnectedNetworks(C.d1) //merge the powernets...

@@ -118,7 +118,7 @@
 		else
 			if (M.ear_damage >= 5)
 				M << "<span class='danger'>Your ears start to ring!</span>"
-		M.update_icons()
+		M.update_icon()
 
 /obj/item/weapon/grenade/flashbang/clusterbang//Created by Polymorph, fixed by Sieve
 	name = "clusterbang"

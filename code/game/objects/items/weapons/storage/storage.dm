@@ -396,7 +396,7 @@
 
 /obj/item/weapon/storage/proc/handle_storage_deferred(mob/user)
 	add_fingerprint(user)
-	user.update_icons()
+	user.update_icon()
 	orient2hud(user)
 	if (user.s_active)
 		user.s_active.show_to(user)

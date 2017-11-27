@@ -320,7 +320,7 @@
 			ear_deaf = max(ear_deaf-1, 0)
 			ear_damage = max(ear_damage-0.05, 0)
 
-		update_icons()
+		update_icon()
 
 	return 1
 
@@ -330,4 +330,4 @@
 		return
 	hat = new_hat
 	new_hat.forceMove(src)
-	update_icons()
+	update_icon()

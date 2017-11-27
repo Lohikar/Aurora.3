@@ -52,7 +52,7 @@
 	add_language("Occult")
 	for(var/spell in construct_spells)
 		src.add_spell(new spell, "const_spell_ready")
-	updateicon()
+	queue_icon_update()
 	add_glow()
 
 /mob/living/simple_animal/construct/death()

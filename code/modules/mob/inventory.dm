@@ -151,7 +151,7 @@ var/list/slot_equipment_priority = list( \
 		if(!(W && W.loc)) return 1 // self destroying objects (tk, grabs)
 
 		W.forceMove(Target)
-		update_icons()
+		update_icon()
 		return 1
 	return 0
 

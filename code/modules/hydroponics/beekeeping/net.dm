@@ -91,7 +91,7 @@
 				qdel(target)
 
 	if (!QDELETED(target))
-		target.update_icons()
+		target.update_icon()
 
 
 
@@ -128,7 +128,7 @@
 				B.feral = 5
 				B.target_mob = M
 			B.strength = 6
-			B.update_icons()
+			B.update_icon()
 			caught_bees -= 6
 
 		//what's left over
@@ -138,7 +138,7 @@
 		if (feralbees)
 			B.feral = 5
 			B.target_mob = M
-		B.update_icons()
+		B.update_icon()
 		caught_bees = 0
 
 	feralbees = 0

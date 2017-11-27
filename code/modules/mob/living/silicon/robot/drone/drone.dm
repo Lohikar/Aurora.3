@@ -124,7 +124,7 @@
 		C.max_damage = 10
 
 	verbs -= /mob/living/silicon/robot/verb/Namepick
-	updateicon()
+	queue_icon_update()
 	density = 0
 
 /mob/living/silicon/robot/drone/init()
@@ -146,8 +146,7 @@
 	real_name = "maintenance drone ([rand(100,999)])"
 	name = real_name
 
-/mob/living/silicon/robot/drone/updateicon()
-
+/mob/living/silicon/robot/drone/update_icon()
 	cut_overlays()
 	if(stat == 0)
 		add_overlay("eyes-[icon_state]")
@@ -165,7 +164,7 @@
 		return
 	hat = new_hat
 	new_hat.forceMove(src)
-	updateicon()
+	queue_icon_update()
 
 //Drones cannot be upgraded with borg modules so we need to catch some items before they get used in ..().
 /mob/living/silicon/robot/drone/attackby(var/obj/item/weapon/W, var/mob/user)

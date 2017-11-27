@@ -351,7 +351,7 @@
 	else
 		usr << "<span class='warning'>This mob type can't use this verb.</span>"
 
-/obj/structure/closet/update_icon()//Putting the welded stuff in updateicon() so it's easy to overwrite for special cases (Fridges, cabinets, and whatnot)
+/obj/structure/closet/update_icon()//Putting the welded stuff in update_icon() so it's easy to overwrite for special cases (Fridges, cabinets, and whatnot)
 	cut_overlays()
 	if(!opened)
 		icon_state = icon_closed

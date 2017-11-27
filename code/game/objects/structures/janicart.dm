@@ -388,8 +388,8 @@
 	return M
 
 
-/obj/structure/bed/chair/janicart/set_dir()
-	..()
+/obj/structure/bed/chair/janicart/set_dir(ndir)
+	. = ..(ndir)
 	if(buckled_mob)
 		if(buckled_mob.loc != loc)
 			buckled_mob.buckled = null //Temporary, so Move() succeeds.

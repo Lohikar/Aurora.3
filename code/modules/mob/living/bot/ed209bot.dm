@@ -19,7 +19,7 @@
 	var/shot_delay = 4
 	var/last_shot = 0
 
-/mob/living/bot/secbot/ed209/update_icons()
+/mob/living/bot/secbot/ed209/update_icon()
 	if(on && is_attacking)
 		icon_state = "ed209-c"
 	else

@@ -132,7 +132,7 @@
 	module_sprites["Basic"] = "robot"
 	icontype = "Basic"
 	updatename(modtype)
-	updateicon()
+	queue_icon_update()
 	if(mmi && mmi.brainobj)
 		mmi.brainobj.lobotomized = 1
 
@@ -277,7 +277,7 @@
 			icontype = module_sprites[1]
 		icon_state = module_sprites[icontype]
 
-	updateicon()
+	queue_icon_update()
 	return module_sprites
 
 /mob/living/silicon/robot/proc/pick_module()
@@ -363,7 +363,7 @@
 			custom_name = newname
 
 		updatename()
-		updateicon()
+		queue_icon_update()
 
 // this verb lets cyborgs see the stations manifest
 /mob/living/silicon/robot/verb/cmd_station_manifest()
@@ -555,7 +555,7 @@
 					C.electronics_damage = WC.burn
 
 				usr << "<span class='notice'>You install the [W.name].</span>"
-				updateicon()
+				queue_icon_update()
 				return
 
 		if (istype(W, /obj/item/weapon/gripper))//Code for allowing cyborgs to use rechargers
@@ -571,7 +571,7 @@
 						cell = null
 						cell_component.wrapped = null
 						cell_component.installed = 0
-						updateicon()
+						queue_icon_update()
 				else if(cell_component.installed == -1)
 					if (Gri.grip_item(cell_component.wrapped, user))
 						cell_component.wrapped = null
@@ -620,7 +620,7 @@
 			if(cell)
 				user << "You close the cover."
 				opened = 0
-				updateicon()
+				queue_icon_update()
 			else if(wiresexposed && wires.IsAllCut())
 				//Cell is out, wires are exposed, remove MMI, produce damaged chassis, baleet original mob.
 				if(!mmi)
@@ -635,7 +635,7 @@
 				C.r_leg = new/obj/item/robot_parts/r_leg(C)
 				C.l_arm = new/obj/item/robot_parts/l_arm(C)
 				C.r_arm = new/obj/item/robot_parts/r_arm(C)
-				C.updateicon()
+				C.queue_icon_update()
 				new/obj/item/robot_parts/chest(loc)
 				qdel(src)
 			else
@@ -669,7 +669,7 @@
 			else
 				user << "You open the cover."
 				opened = 1
-				updateicon()
+				queue_icon_update()
 	else if (istype(W, /obj/item/weapon/stock_parts/matter_bin) && opened) // Installing/swapping a matter bin
 		if(storage)
 			user << "You replace \the [storage] with \the [W]"
@@ -702,7 +702,7 @@
 			//This will mean that removing and replacing a power cell will repair the mount, but I don't care at this point. ~Z
 			C.brute_damage = 0
 			C.electronics_damage = 0
-			updateicon()
+			queue_icon_update()
 
 	else if (iswirecutter(W) || ismultitool(W))
 		if (wiresexposed)
@@ -713,14 +713,14 @@
 	else if(isscrewdriver(W) && opened && !cell)	// haxing
 		wiresexposed = !wiresexposed
 		user << "The wires have been [wiresexposed ? "exposed" : "unexposed"]"
-		updateicon()
+		queue_icon_update()
 
 	else if(isscrewdriver(W) && opened && cell)	// radio
 		if(radio)
 			radio.attackby(W,user)//Push it to the radio to let it handle everything
 		else
 			user << "Unable to locate a radio."
-		updateicon()
+		queue_icon_update()
 
 	else if(istype(W, /obj/item/device/encryptionkey/) && opened)
 		if(radio)//sanityyyyyy
@@ -737,7 +737,7 @@
 			if(allowed(usr))
 				locked = !locked
 				user << "You [ locked ? "lock" : "unlock"] [src]'s interface."
-				updateicon()
+				queue_icon_update()
 			else
 				user << "<span class='warning'>Access denied.</span>"
 
@@ -783,7 +783,7 @@
 			cell = null
 			cell_component.wrapped = null
 			cell_component.installed = 0
-			updateicon()
+			queue_icon_update()
 		else if(cell_component.installed == -1)
 			cell_component.installed = 0
 			var/obj/item/broken_device = cell_component.wrapped
@@ -823,7 +823,7 @@
 			return 1
 	return 0
 
-/mob/living/silicon/robot/updateicon()
+/mob/living/silicon/robot/update_icon()
 	cut_overlays()
 
 	if(stat == CONSCIOUS)
@@ -1089,7 +1089,7 @@
 	else
 		icontype = input("Select an icon! [icon_selection_tries ? "You have [icon_selection_tries] more chance\s." : "This is your last try."]", "Robot", icontype, null) in module_sprites
 	icon_state = module_sprites[icontype]
-	updateicon()
+	queue_icon_update()
 
 	if (module_sprites.len > 1 && icon_selection_tries >= 1 && client)
 		icon_selection_tries--
@@ -1234,7 +1234,7 @@
 						if(rebuild)
 							src.module.modules += new /obj/item/weapon/pickaxe/diamonddrill(src.module)
 							src.module.rebuild()
-					updateicon()
+					queue_icon_update()
 			else
 				user << "You fail to hack [src]'s interface."
 				src << "Hack attempt detected."

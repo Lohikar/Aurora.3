@@ -27,7 +27,7 @@
 	. = ..()
 	verbs += /mob/living/silicon/robot/proc/choose_icon
 
-/mob/living/silicon/robot/syndicate/updateicon() //because this was the only way I found out how to make their eyes and etc works
+/mob/living/silicon/robot/syndicate/update_icon() //because this was the only way I found out how to make their eyes and etc works
 	cut_overlays()
 	if(stat == 0)
 		add_overlay("eyes-[icon_state]")

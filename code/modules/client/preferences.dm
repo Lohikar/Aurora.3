@@ -381,7 +381,7 @@ datum/preferences
 		character.update_mutations(0)
 		character.update_body(0)
 		character.update_hair(0)
-		character.update_icons()
+		character.update_icon()
 
 /datum/preferences/proc/open_load_dialog_sql(mob/user)
 	var/dat = "<body>"

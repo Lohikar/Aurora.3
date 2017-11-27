@@ -37,10 +37,10 @@
 			"What do you get from eating tree decorations?\n\n<i>Tinsilitis!</i>",
 			"What do snowmen wear on their heads?\n\n<i>Ice caps!</i>",
 			"Why is Christmas just like life on ss13?\n\n<i>You do all the work and the fat guy gets all the credit.</i>",
-			"Why doesnÔøΩt Santa have any children?\n\n<i>Because he only comes down the chimney.</i>")
+			"Why doesnùt Santa have any children?\n\n<i>Because he only comes down the chimney.</i>")
 		Joke.set_content_unsafe(title, content)
 		new /obj/item/clothing/head/festive(target.loc)
-		user.update_icons()
+		user.update_icon()
 		cracked = 1
 		icon_state = "cracker1"
 		var/obj/item/weapon/toy/xmas_cracker/other_half = new /obj/item/weapon/toy/xmas_cracker(target)

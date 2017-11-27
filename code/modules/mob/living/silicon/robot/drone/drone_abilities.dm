@@ -30,6 +30,6 @@
 		H.put_in_hands(hat)
 		H.visible_message("<span class='danger'>\The [H] removes \the [src]'s [hat].</span>")
 		hat = null
-		updateicon()
+		queue_icon_update()
 	else
 		return ..()

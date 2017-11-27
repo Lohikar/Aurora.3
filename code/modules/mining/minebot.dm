@@ -36,7 +36,7 @@
 
 	verbs -= /mob/living/silicon/robot/verb/Namepick
 	verbs -= /mob/living/silicon/robot/drone/verb/set_mail_tag
-	updateicon()
+	update_icon()
 	density = 0
 
 /mob/living/silicon/robot/drone/mining/updatename()
