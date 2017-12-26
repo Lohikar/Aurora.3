@@ -192,7 +192,8 @@
 	icon_state = "shade"
 	density = 1
 
-/obj/effect/shadow_wight/New()
+/obj/effect/shadow_wight/Initialize()
+	. = ..()
 	START_PROCESSING(SSprocessing, src)
 
 /obj/effect/shadow_wight/Destroy()
@@ -200,9 +201,9 @@
 	return ..()
 
 /obj/effect/shadow_wight/process()
-	if(src.loc)
-		src.loc = get_turf(pick(orange(1,src)))
-		var/mob/living/carbon/M = locate() in src.loc
+	if(loc)
+		forceMove(get_turf(pick(orange(1,src))))
+		var/mob/living/carbon/M = locate() in loc
 		if(M)
 			playsound(src.loc, pick('sound/hallucinations/behind_you1.ogg',\
 			'sound/hallucinations/behind_you2.ogg',\
@@ -219,7 +220,7 @@
 			'sound/hallucinations/turn_around2.ogg',\
 			), 50, 1, -3)
 			M.sleeping = max(M.sleeping,rand(5,10))
-			src.loc = null
+			qdel(src)
 	else
 		STOP_PROCESSING(SSprocessing, src)
 

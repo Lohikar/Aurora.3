@@ -100,5 +100,6 @@
 	desc = "It's fossilised plant remains."
 	animal = 0
 
-/obj/item/weapon/fossil/plant/New()
+/obj/item/weapon/fossil/plant/Initialize()
+	. = ..()
 	icon_state = "plant[rand(1,4)]"

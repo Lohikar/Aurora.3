@@ -135,6 +135,13 @@
 /obj/item/weapon/disk
 	name = "disk"
 	icon = 'icons/obj/items.dmi'
+	var/random_offset = FALSE
+
+/obj/item/weapon/disk/Initialize()
+	. = ..()
+	if (random_offset)
+		pixel_x = rand(-5, 5)
+		pixel_y = rand(-5, 5)
 
 /*
 /obj/item/weapon/game_kit
