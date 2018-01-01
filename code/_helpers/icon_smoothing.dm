@@ -193,22 +193,13 @@
 /turf/diagonal_smooth(adjacencies)
 	adjacencies = reverse_ndir(..())
 	if (smooth_underlays && adjacencies)
-		// This should be a mutable_appearance, but we're still on 510.
-		// Alas.
-		var/mutable_appearance/underlay_appearance = new(layer = TURF_LAYER)
+		var/image/underlay_appearance = new(layer = TURF_LAYER)
 		var/list/U = list(underlay_appearance)
 		if(fixed_underlay)
 			if(fixed_underlay["space"])
 				var/istate = "[((x + y) ^ ~(x * y) + z) % 25]"
-				underlay_appearance.icon = 'icons/turf/space.dmi'
-				underlay_appearance.icon_state = istate
-				underlay_appearance.plane = PLANE_SPACE_BACKGROUND
-
-				var/image/dust = image('icons/turf/space_parallax1.dmi', istate)
-				dust.plane = PLANE_SPACE_DUST
-				dust.alpha = 80
-				dust.blend_mode = BLEND_ADD
-				U += dust
+				U.Cut()
+				U += SSicon_cache.space_cache[istate]
 			else
 				underlay_appearance.icon = fixed_underlay["icon"]
 				underlay_appearance.icon_state = fixed_underlay["icon_state"]
