@@ -1,7 +1,7 @@
 // min is inclusive, max is exclusive
 /proc/Wrap(val, min, max)
 	var/d = max - min
-	var/t = Floor((val - min) / d)
+	var/t = FLOOR((val - min) / d)
 	return val - (t * d)
 
 /proc/Default(a, b)
@@ -24,12 +24,6 @@
 	if(!x && !y) return 0
 	var/a = arccos(x / sqrt(x*x + y*y))
 	return y >= 0 ? a : -a
-
-/proc/Floor(x)
-	return round(x)
-
-/proc/Ceiling(x, y=1)
-	return -round(-x / y) * y
 
 // Greatest Common Divisor: Euclid's algorithm.
 /proc/Gcd(a, b)
@@ -59,7 +53,7 @@
 	return (val >= min) && (val <= max)
 
 /proc/IsInteger(x)
-	return Floor(x) == x
+	return FLOOR(x) == x
 
 /proc/IsMultiple(x, y)
 	return x % y == 0

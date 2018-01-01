@@ -66,7 +66,7 @@
 	var/list/Tcorners
 
 	// We don't need no damn vis checks!
-	for (Tthing in RANGE_TURFS(Ceiling(light_range), source_turf))
+	for (Tthing in RANGE_TURFS(CEILING(light_range), source_turf))
 		T = Tthing
 		if (the_station_areas[T.loc])
 			continue

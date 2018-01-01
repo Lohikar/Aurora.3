@@ -358,7 +358,7 @@
 	var/zlights_going_up = FALSE
 	var/turf/originalT	// This is needed to reset our search point for bidirectional Z-lights.
 
-	FOR_DVIEW(originalT, Ceiling(actual_range), source_turf, 0)
+	FOR_DVIEW(originalT, CEILING(actual_range), source_turf, 0)
 		T = originalT
 		zlights_going_up = FALSE
 		check_t:

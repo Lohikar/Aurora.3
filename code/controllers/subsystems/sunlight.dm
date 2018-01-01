@@ -70,7 +70,7 @@
 	return ..()
 
 /atom/movable/sunobj/Initialize()
-	light_range = Ceiling(config.sun_accuracy * 1.2)
+	light_range = CEILING(config.sun_accuracy * 1.2)
 	return ..()
 
 /atom/movable/sunobj/can_fall()

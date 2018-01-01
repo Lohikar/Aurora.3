@@ -43,3 +43,8 @@
 
 #define round_duration_in_ticks (round_start_time ? world.time - round_start_time : 0)
 #define station_time_in_ticks (roundstart_hour HOURS + round_duration_in_ticks)
+
+#define CEILING(x) round(x, 1)
+#define CEILING_EX(x, y) ( -round(-(x) / (y)) * (y) )
+
+#define FLOOR(x) round(x)
