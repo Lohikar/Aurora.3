@@ -9,12 +9,14 @@ emp_act
 */
 
 /mob/living/carbon/human/bullet_act(var/obj/item/projectile/P, var/def_zone)
+	if(martial_art && martial_art.deflection_chance)
+		if(prob(martial_art.deflection_chance))
+			src.visible_message("<span class='danger'>\The [src] deflects \the [P]!</span>")
+			return 0
 
 	def_zone = check_zone(def_zone)
 	if(!has_organ(def_zone))
 		return PROJECTILE_FORCE_MISS //if they don't have the organ in question then the projectile just passes by.
-
-	var/obj/item/organ/external/organ = get_organ()
 
 	//Shields
 	var/shield_check = check_shields(P.damage, P, null, def_zone, "the [P.name]")
@@ -24,6 +26,13 @@ emp_act
 		else
 			P.on_hit(src, 100, def_zone)
 			return 100
+
+	var/obj/item/organ/external/organ = get_organ(def_zone)
+
+	// Tell clothing we're wearing that it got hit by a bullet/laser/etc
+	var/list/clothing = get_clothing_list_organ(organ)
+	for(var/obj/item/clothing/C in clothing)
+		C.clothing_impact(P, P.damage)
 
 	//Shrapnel
 	if(!(species.flags & NO_EMBED) && P.can_embed())
@@ -100,6 +109,15 @@ emp_act
 			siemens_coefficient *= C.siemens_coefficient
 
 	return siemens_coefficient
+
+// Returns a list of clothing that is currently covering def_zone.
+/mob/living/carbon/human/proc/get_clothing_list_organ(var/obj/item/organ/external/def_zone, var/type)
+	var/list/results = list()
+	var/list/clothing_items = list(head, wear_mask, wear_suit, w_uniform, gloves, shoes)
+	for(var/obj/item/clothing/C in clothing_items)
+		if(istype(C) && (C.body_parts_covered & def_zone.body_part))
+			results.Add(C)
+	return results
 
 //this proc returns the armour value for a particular external organ.
 /mob/living/carbon/human/proc/getarmor_organ(var/obj/item/organ/external/def_zone, var/type)
@@ -193,6 +211,12 @@ emp_act
 	var/obj/item/organ/external/affecting = get_organ(hit_zone)
 	if(!affecting)
 		return 0
+
+	// Allow clothing to respond to being hit.
+	// This is done up here so that clothing damage occurs even if fully blocked.
+	var/list/clothing = get_clothing_list_organ(affecting)
+	for(var/obj/item/clothing/C in clothing)
+		C.clothing_impact(I, effective_force)
 
 	// Handle striking to cripple.
 	if(user.a_intent == I_DISARM)
@@ -460,3 +484,40 @@ emp_act
 		perm += perm_by_part[part]
 
 	return perm
+
+/mob/living/carbon/human/proc/grabbedby(mob/living/carbon/human/user,var/supress_message = 0)
+	if(user == src || anchored)
+		return 0
+	if(user.disabilities & PACIFIST)
+		to_chat(user, "<span class='notice'>You don't want to risk hurting [src]!</span>")
+		return 0
+
+	for(var/obj/item/weapon/grab/G in user.grabbed_by)
+		if(G.assailant == user)
+			user << "<span class='notice'>You already grabbed [src].</span>"
+			return
+
+	if (!attempt_grab(user))
+		return
+
+	if(src.w_uniform)
+		src.w_uniform.add_fingerprint(src)
+
+	var/obj/item/weapon/grab/G = new /obj/item/weapon/grab(user, src)
+	if(buckled)
+		user << "<span class='notice'>You cannot grab [src], \he is buckled in!</span>"
+	if(!G)	//the grab will delete itself in New if affecting is anchored
+		return
+	user.put_in_active_hand(G)
+	G.synch()
+	LAssailant = user
+
+	user.do_attack_animation(src)
+	playsound(loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
+	if(user.gloves && istype(user.gloves,/obj/item/clothing/gloves/force/syndicate)) //only antag gloves can do this for now
+		G.state = GRAB_AGGRESSIVE
+		G.icon_state = "grabbed1"
+		visible_message("<span class='warning'>[user] gets a strong grip on [src]!</span>")
+		return 1
+	visible_message("<span class='warning'>[user] has grabbed [src] passively!</span>")
+	return 1

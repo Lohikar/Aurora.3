@@ -291,7 +291,7 @@ var/list/holder_mob_icon_cache = list()
 	reagents = M.reagents
 
 /obj/item/weapon/holder/human/sync(var/mob/living/M)
-
+	cut_overlays()
 	// Generate appropriate on-mob icons.
 	var/mob/living/carbon/human/owner = M
 	if(!icon && istype(owner) && owner.species)
@@ -345,7 +345,7 @@ var/list/holder_mob_icon_cache = list()
 		color = M.color
 		name = M.name
 		desc = M.desc
-		overlays |= M.overlays
+		copy_overlays(M)
 		var/mob/living/carbon/human/H = loc
 		if(istype(H))
 			if(H.l_hand == src)
@@ -423,6 +423,16 @@ var/list/holder_mob_icon_cache = list()
 	slot_flags = SLOT_HEAD
 	w_class = 1
 	item_state = "cat"
+
+/obj/item/weapon/holder/cat/penny
+	name = "Penny"
+	desc = "An important cat, straight from Central Command."
+	icon_state = "penny"
+	icon_state_dead = "penny_dead"
+	slot_flags = SLOT_HEAD
+	w_class = 1
+	item_state = "penny"
+	contained_sprite = 1
 
 
 /obj/item/weapon/holder/borer

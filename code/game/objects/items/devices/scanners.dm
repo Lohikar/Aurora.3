@@ -23,7 +23,7 @@ REAGENT SCANNER
 
 
 /obj/item/device/healthanalyzer/attack(mob/living/M as mob, mob/living/user as mob)
-	if (( (CLUMSY in user.mutations) || user.getBrainLoss() >= 60) && prob(50))
+	if ( ((CLUMSY in user.mutations) || (DUMB in user.mutations)) && prob(50))
 		user << text("<span class='warning'>You try to analyze the floor's vitals!</span>")
 		for(var/mob/O in viewers(M, null))
 			O.show_message("<span class='warning'>\The [user] has analyzed the floor's vitals!</span>", 1)
@@ -112,6 +112,15 @@ REAGENT SCANNER
 					++unknown
 			if(unknown)
 				user << "<span class='warning'>Non-medical reagent[(unknown > 1)?"s":""] found in subject's stomach.</span>"
+		if(C.breathing && C.breathing.total_volume)
+			var/unknown = 0
+			for(var/datum/reagent/R in C.breathing.reagent_list)
+				if(R.scannable)
+					user << "<span class='notice'>[R.name] found in subject's respitory system.</span>"
+				else
+					++unknown
+			if(unknown)
+				user << "<span class='warning'>Non-medical reagent[(unknown > 1)?"s":""] found in subject's respitory system.</span>"
 		if(C.virus2.len)
 			for (var/ID in C.virus2)
 				if (ID in virusDB)
@@ -128,14 +137,16 @@ REAGENT SCANNER
 //	Remove brain worm scans. Bad.
 //	if (M.has_brain_worms())
 //		user.show_message("<span class='warning'>Subject suffering from aberrant brain activity. Recommend further scanning.</span>")
-	if (M.getBrainLoss() >= 100 || !M.has_brain())
-		user.show_message("<span class='warning'>Subject is brain dead.</span>")
-	else if (M.getBrainLoss() >= 60)
-		user.show_message("<span class='warning'>Severe brain damage detected. Subject likely to have mental retardation.</span>")
-	else if (M.getBrainLoss() >= 10)
-		user.show_message("<span class='warning'>Significant brain damage detected. Subject may have had a concussion.</span>")
 	if(ishuman(M))
 		var/mob/living/carbon/human/H = M
+		if (H.getBrainLoss() >= config.default_brain_health || !H.has_brain())
+			user.show_message("<span class='warning'>Subject is brain dead.</span>")
+		else if (H.getBrainLoss() >= 120)
+			to_chat(user, "\t<span class='alert'>Severe brain damage detected. Subject likely to have mental traumas.</span>")
+		else if (H.getBrainLoss() >= 45)
+			to_chat(user, "\t<span class='alert'>Brain damage detected.</span>")
+		else if(LAZYLEN(H.get_traumas()))
+			to_chat(user, "\t<span class='alert'>Severe brain damage detected. Subject likely to have mental traumas.</span>")
 		for(var/name in H.organs_by_name)
 			var/obj/item/organ/external/e = H.organs_by_name[name]
 			if(!e)

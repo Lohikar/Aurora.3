@@ -16,7 +16,7 @@
 		"Skrell" = 'icons/mob/species/skrell/helmet.dmi',
 		"Unathi" = 'icons/mob/species/unathi/helmet.dmi'
 		)
-	species_restricted = list("exclude","Diona","Xenomorph","Vaurca","Golem")
+	species_restricted = list("exclude","Diona","Xenomorph","Vaurca","Golem", "Vox")
 
 /obj/item/clothing/gloves/rig
 	name = "gauntlets"
@@ -26,6 +26,7 @@
 	cold_protection =    HANDS
 	species_restricted = null
 	gender = PLURAL
+	punch_force = 5
 
 /obj/item/clothing/shoes/magboots/rig
 	name = "boots"
@@ -50,7 +51,7 @@
 	resilience = 0.2
 	can_breach = 1
 	sprite_sheets = list("Tajara" = 'icons/mob/species/tajaran/suit.dmi',"Unathi" = 'icons/mob/species/unathi/suit.dmi')
-	species_restricted = list("exclude","Diona","Xenomorph","Vaurca","Golem")
+	species_restricted = list("exclude","Diona","Xenomorph","Vaurca","Golem", "Vox")
 	supporting_limbs = list()
 
 //TODO: move this to modules

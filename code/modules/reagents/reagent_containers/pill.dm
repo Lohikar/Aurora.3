@@ -19,7 +19,7 @@
 
 	attack(mob/M as mob, mob/user as mob, def_zone)
 		//TODO: replace with standard_feed_mob() call.
-		
+
 		if(M == user)
 			if(!M.can_eat(src))
 				return
@@ -155,14 +155,37 @@
 		. = ..()
 		reagents.add_reagent("methylphenidate", 15)
 
-/obj/item/weapon/reagent_containers/pill/citalopram
-	name = "Citalopram pill"
+/obj/item/weapon/reagent_containers/pill/escitalopram
+	name = "Escitalopram pill"
 	desc = "Mild anti-depressant."
 	icon_state = "pill8"
 	Initialize()
 		. = ..()
-		reagents.add_reagent("citalopram", 15)
-
+		reagents.add_reagent("escitalopram", 15)
+	
+/obj/item/weapon/reagent_containers/pill/escitalopram
+	name = "Escitalopram pill"
+	desc = "Mild anti-depressant."
+	icon_state = "pill8"
+	Initialize()
+		. = ..()
+		reagents.add_reagent("escitalopram", 15)
+		
+/obj/item/weapon/reagent_containers/pill/hextrasenil
+	name = "Hextrasenil pill"
+	desc = "Don't forget to take your pills."
+	icon_state = "pill6"
+	Initialize()
+		. = ..()
+		reagents.add_reagent("hextrasenil", 30)
+		
+/obj/item/weapon/reagent_containers/pill/trisyndicotin
+	name = "Trisyndicotin pill"
+	desc = "For when you need a little convincing."
+	icon_state = "pill4"
+	Initialize()
+		. = ..()
+		reagents.add_reagent("trisyndicotin", 30)
 
 /obj/item/weapon/reagent_containers/pill/inaprovaline
 	name = "Inaprovaline pill"
@@ -246,3 +269,13 @@
 	Initialize()
 		. = ..()
 		reagents.add_reagent("spaceacillin", 15)
+
+/obj/item/weapon/reagent_containers/pill/bio_vitamin
+	name = "Vitamin pill"
+	desc = "Contains a meal's worth of nutrients."
+	icon_state = "pill11"
+	Initialize()
+		. = ..()
+		reagents.add_reagent("nutriment", 20)
+		reagents.add_reagent(pick("banana","berryjuice","grapejuice","lemonjuice","limejuice","orangejuice","watermelonjuice"),1)
+		//Would be absolutely retarded to grind the biogenerator for juices.

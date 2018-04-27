@@ -213,7 +213,7 @@
 		to_chat(src, "<span class='warning'>Your powers are not capable of taking you that far.</span>")
 		return
 
-	if (!T.dynamic_lighting || T.get_lumcount() > 0.1)
+	if (T.get_lumcount() > 0.1)
 		// Too bright, cannot jump into.
 		to_chat(src, "<span class='warning'>The destination is too bright.</span>")
 		return
@@ -602,7 +602,7 @@
 // Dominate a victim, imbed a thought into their mind.
 /mob/living/carbon/human/proc/vampire_dominate()
 	set category = "Vampire"
-	set name = "Dominate (25)"
+	set name = "Dominate (50)"
 	set desc = "Dominate the mind of a victim, make them obey your will."
 
 	var/datum/vampire/vampire = vampire_power(25, 0)
@@ -649,7 +649,7 @@
 	to_chat(src, "<span class='notice'>You command [T], and they will obey.</span>")
 	emote("me", 1, "whispers.")
 
-	vampire.use_blood(25)
+	vampire.use_blood(50)
 	verbs -= /mob/living/carbon/human/proc/vampire_dominate
 	ADD_VERB_IN_IF(src, 1800, /mob/living/carbon/human/proc/vampire_dominate, CALLBACK(src, .proc/finish_vamp_timeout))
 
@@ -747,7 +747,7 @@
 
 	admin_attack_log(src, T, "used diseased touch on [key_name(T)]", "was given a lethal disease by [key_name(src)]", "used diseased touch (<a href='?src=\ref[lethal];info=1'>virus info</a>) on")
 
-	vampire.use_blood(200)
+	vampire.use_blood(100)
 	verbs -= /mob/living/carbon/human/proc/vampire_diseasedtouch
 	ADD_VERB_IN_IF(src, 1800, /mob/living/carbon/human/proc/vampire_diseasedtouch, CALLBACK(src, .proc/finish_vamp_timeout))
 
@@ -898,7 +898,7 @@
 
 	// You ain't goin' anywhere, bud.
 	if (!T.client && T.mind)
-		for (var/mob/dead/observer/ghost in player_list)
+		for (var/mob/abstract/observer/ghost in player_list)
 			if (ghost.mind == T.mind)
 				ghost.can_reenter_corpse = 1
 				ghost.reenter_corpse()

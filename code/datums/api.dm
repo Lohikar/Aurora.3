@@ -147,7 +147,7 @@ proc/api_update_command_database()
 	var/versionstring = null
 	//The Version Number follows SemVer http://semver.org/
 	version["major"] = 2 //Major Version Number --> Increment when implementing breaking changes
-	version["minor"] = 0 //Minor Version Number --> Increment when adding features
+	version["minor"] = 2 //Minor Version Number --> Increment when adding features
 	version["patch"] = 0 //Patchlevel --> Increment when fixing bugs
 
 	versionstring = "[version["major"]].[version["minor"]].[version["patch"]]"
@@ -714,7 +714,7 @@ proc/api_update_command_database()
 	var/allow_antaghud = queryparams["allow_antaghud"]
 	var/senderkey = queryparams["senderkey"] //Identifier of the sender (Ckey / Userid / ...)
 
-	var/mob/dead/observer/G = ghosts[target]
+	var/mob/abstract/observer/G = ghosts[target]
 
 	if(!G in ghosts)
 		statuscode = 404
@@ -861,7 +861,7 @@ proc/api_update_command_database()
 		"title" = list("name"="title","desc"="The message title that should be sent, Defaults to NanoTrasen Update if not specified","req"=0,"type"="str"),
 		"body" = list("name"="body","desc"="The message body that should be sent","req"=1,"type"="str"),
 		"type" = list("name"="type","desc"="The type of the message that should be sent, Defaults to freeform","req"=0,"type"="slct","options"=list("freeform","ccia")),
-		"sendername" = list("name"="sendername","desc"="IC Name of the sender for the CCIA Report, Defaults to CCIAAMS, \[Command-StationName\]","req"=0,"type"="string"),
+		"sendername" = list("name"="sendername","desc"="IC Name of the sender for the CCIA Report, Defaults to CCIAAMS, \[Command-StationName\]","req"=0,"type"="str"),
 		"announce" = list("name"="announce","desc"="If the report should be announce 1 -> Yes, 0 -> No, Defaults to 1","req"=0,"type"="int")
 		)
 /datum/topic_command/send_commandreport/run_command(queryparams)
@@ -944,9 +944,9 @@ proc/api_update_command_database()
 	//Announce that the fax has been sent
 	if(faxannounce == 1)
 		if(sendsuccess.len < 1)
-			command_announcement.Announce("A fax message from Central Command could not be delivered because all of the following fax machines are inoperational: <br>"+list2text(targetlist, ", "), "Fax Received", new_sound = 'sound/AI/commandreport.ogg', msg_sanitized = 1);
+			command_announcement.Announce("A fax message from Central Command could not be delivered because all of the following fax machines are inoperational: <br>"+jointext(targetlist, ", "), "Fax Received", new_sound = 'sound/AI/commandreport.ogg', msg_sanitized = 1);
 		else
-			command_announcement.Announce("A fax message from Central Command has been sent to the following fax machines: <br>"+list2text(sendsuccess, ", "), "Fax Received", new_sound = 'sound/AI/commandreport.ogg', msg_sanitized = 1);
+			command_announcement.Announce("A fax message from Central Command has been sent to the following fax machines: <br>"+jointext(sendsuccess, ", "), "Fax Received", new_sound = 'sound/AI/commandreport.ogg', msg_sanitized = 1);
 
 	log_admin("[senderkey] sent a fax via the API: : [faxbody]",admin_key=senderkey)
 	message_admins("[senderkey] sent a fax via the API", 1)
@@ -969,7 +969,7 @@ proc/api_update_command_database()
 	if(!P.stamped)
 		P.stamped = new
 	P.stamped += /obj/item/weapon/stamp
-	P.overlays += stampoverlay
+	P.add_overlay(stampoverlay)
 	P.stamps += "<HR><i>This paper has been stamped by the Central Command Quantum Relay.</i>"
 
 	if(F.recievefax(P))
@@ -1004,4 +1004,203 @@ proc/api_update_command_database()
 			statuscode = 200
 			response = "Ingame Discord bot's channels were successfully updated."
 
+	return 1
+
+// Gets the currently configured access levels
+/datum/topic_command/get_access_levels
+	name = "get_access_levels"
+	description = "Gets the currently configured access levels."
+
+/datum/topic_command/get_access_levels/run_command()
+	var/list/access_levels = list()
+	for(var/datum/access/acc in get_all_access_datums())
+		access_levels.Add(list(acc.get_info_list()))
+
+	data = access_levels
+	statuscode = 200
+	response = "Levels Sent"
+	return 1
+
+// Reloads the current cargo configuration
+/datum/topic_command/cargo_reload
+	name = "cargo_reload"
+	description = "Reloads the current cargo configuration."
+	params = list(
+		"force" = list("name"="force","desc"="Force the reload even if orders have already been placed","type"="int","req"=0)
+	)
+
+/datum/topic_command/cargo_reload/run_command(queryparams)
+	var/force = text2num(queryparams["force"])
+	if(!SScargo.get_order_count())
+		SScargo.load_from_sql()
+		message_admins("Cargo has been reloaded via the API.")
+		statuscode = 200
+		response = "Cargo Reloaded from SQL."
+	else
+		if(force)
+			SScargo.load_from_sql()
+			message_admins("Cargo has been force-reloaded via the API. All current orders have been purged.")
+			statuscode = 200
+			response = "Cargo Force-Reloaded from SQL."
+		else
+			statuscode = 500
+			response = "Orders have been placed. Use force parameter to overwrite."
+	return 1
+
+//Gets a overview of all polls (title, id, type)
+/datum/topic_command/get_polls
+	name = "get_polls"
+	description = "Gets a overview of all polls."
+	params = list(
+		"current_only" = list("name"="current_only","desc"="Only get information about the current polls","type"="int","req"=0),
+		"admin_only" = list("name"="admin_only","desc"="Only get information about the admin_only polls","type"="int","req"=0)
+	)
+
+/datum/topic_command/get_polls/run_command(queryparams)
+	var/current_only = text2num(queryparams["current_only"])
+	var/admin_only = text2num(queryparams["admin_only"])
+	
+	if(!establish_db_connection(dbcon))
+		statuscode = 500
+		response = "DB-Connection unavailable"
+		return 1
+
+	var/list/polldata = list()
+
+	var/DBQuery/select_query = dbcon.NewQuery("SELECT id, polltype, starttime, endtime, question, multiplechoiceoptions, adminonly FROM ss13_poll_question [(current_only || admin_only) ? "WHERE" : ""] [(admin_only ? "adminonly = true " : "")][(current_only && admin_only ? "AND " : "")][(current_only ? "Now() BETWEEN starttime AND endtime" : "")]")
+	select_query.Execute()
+	while(select_query.NextRow())
+		polldata["[select_query.item[1]]"] = list(
+			"id"=select_query.item[1],
+			"polltype"=select_query.item[2],
+			"starttime"=select_query.item[3],
+			"endtime"=select_query.item[4],
+			"question"=select_query.item[5],
+			"multiplechoiceoptions"=select_query.item[6],
+			"adminonly"=select_query.item[7]
+			)
+
+	statuscode = 200
+	response = "Polldata sent"
+	data = polldata
+	return 1
+
+
+// Gets infos about a poll
+/datum/topic_command/get_poll_info
+	name = "get_poll_info"
+	description = "Gets Information about a poll."
+	params = list(
+		"poll_id" = list("name"="poll_id","desc"="The poll id that should be queried","type"="int","req"=1)
+	)
+
+/datum/topic_command/get_poll_info/run_command(queryparams)
+	var/poll_id = text2num(queryparams["poll_id"])
+
+	if(!establish_db_connection(dbcon))
+		statuscode = 500
+		response = "DB-Connection unavailable"
+		return 1
+
+	//Get general data about the poll
+	var/DBQuery/select_query = dbcon.NewQuery("SELECT id, polltype, starttime, endtime, question, multiplechoiceoptions, adminonly, publicresult, viewtoken FROM ss13_poll_question WHERE id = :poll_id:")
+	select_query.Execute(list("poll_id"=poll_id))
+
+	//Check if the poll exists
+	if(!select_query.NextRow())
+		statuscode = 404
+		response = "The requested poll does not exist"
+		data = null
+		return 1
+	var/list/poll_data = list(
+		"id"=select_query.item[1],
+		"polltype"=select_query.item[2],
+		"starttime"=select_query.item[3],
+		"endtime"=select_query.item[4],
+		"question"=select_query.item[5],
+		"multiplechoiceoptions"=select_query.item[6],
+		"adminonly"=select_query.item[7],
+		"publicresult"=select_query.item[8]
+		)
+
+	//Lets add a WI link to the poll, if we have the WI configured
+	if(config.webint_url)
+		poll_data["link"]="[config.webint_url]server/poll/[select_query.item[1]]/[select_query.item[9]]"
+
+	var/list/result_data = list()
+
+	/** Return different data based on the poll type: */
+	//If we have a option or a multiple choice poll, return the number of options
+	if(poll_data["polltype"] == "OPTION" || poll_data["polltype"] == "MULTICHOICE")
+		var/DBQuery/result_query = dbcon.NewQuery({"SELECT ss13_poll_vote.optionid, ss13_poll_option.text, COUNT(*) as option_count
+			FROM ss13_poll_vote
+			LEFT JOIN ss13_poll_option ON ss13_poll_vote.optionid = ss13_poll_option.id
+			WHERE ss13_poll_vote.pollid = :poll_id:
+			GROUP BY ss13_poll_vote.optionid"})
+		result_query.Execute(list("poll_id"=poll_id))
+
+		while(result_query.NextRow())
+			result_data["[result_query.item[1]]"] = list(
+				"option_id"=result_query.item[1],
+				"option_question"=result_query.item[2],
+				"option_count"=result_query.item[3]
+			)
+		if(!length(result_data))
+			statuscode = 500
+			response = "No data returned by result query."
+			data = null
+			return 1
+
+	//If we have a numval poll, return the options with the min, max, and average
+	else if(poll_data["polltype"] == "NUMVAL")
+		var/DBQuery/result_query = dbcon.NewQuery({"SELECT ss13_poll_vote.optionid, ss13_poll_option.text, ss13_poll_option.minval, ss13_poll_option.maxval, ss13_poll_option.descmin, ss13_poll_option.descmid, ss13_poll_option.descmax, AVG(rating) as option_rating_avg, MIN(rating) as option_rating_min, MAX(rating) as option_rating_max
+		FROM ss13_poll_vote
+		LEFT JOIN ss13_poll_option ON ss13_poll_vote.optionid = ss13_poll_option.id
+		WHERE ss13_poll_vote.pollid = :poll_id:
+		GROUP BY ss13_poll_vote.optionid"})
+		result_query.Execute(list("poll_id"=poll_id))
+		while(result_query.NextRow())
+			result_data["[result_query.item[1]]"] = list(
+				"option_id"=result_query.item[1],
+				"option_question"=result_query.item[2],
+				"option_minval"=result_query.item[3],
+				"option_maxval"=result_query.item[4],
+				"option_descmin"=result_query.item[5],
+				"option_descmid"=result_query.item[6],
+				"option_descmax"=result_query.item[7],
+				"option_rating_min"=result_query.item[8],
+				"option_rating_max"=result_query.item[9],
+				"option_rating_avg"=result_query.item[10] //TODO: Expand that with MEDIAN once we upgrade mariadb
+			)
+		if(!length(result_data))
+			statuscode = 500
+			response = "No data returned by result query."
+			data = null
+			return 1
+
+	//If we have a textpoll, return the number of answers
+	else if(poll_data["polltype"] == "TEXT")
+		var/DBQuery/result_query = dbcon.NewQuery({"SELECT COUNT(*) as count FROM ss13_poll_textreply WHERE pollid = :poll_id:"})
+		result_query.Execute(list("poll_id"=poll_id))
+		if(result_query.NextRow())
+			result_data = list(
+				"response_count"=result_query.item[1]
+			)
+		else
+			statuscode = 500
+			response = "No data returned by result query."
+			data = null
+			return 1
+	else
+		statuscode = 500
+		response = "Unknown Poll Type"
+		data = poll_data
+		return 1
+	
+
+	poll_data["results"] = result_data
+
+	statuscode = 200
+	response = "Poll data fetched"
+	data = poll_data
 	return 1

@@ -2,6 +2,9 @@
 	name = "Aurora"
 	full_name = "NSS Aurora"
 	path = "aurora"
+
+	lobby_screens = list("aurora_asteroid", "aurora_postcard")
+
 	station_levels = list(3, 4, 5, 6, 7)
 	admin_levels = list(1)
 	contact_levels = list(3, 4, 5, 6)
@@ -10,10 +13,10 @@
 	base_turf_by_z = list(
 		"1" = /turf/space,
 		"2" = /turf/space,
-		"3" = /turf/simulated/floor/asteroid,
-		"4" = /turf/simulated/floor/asteroid,
-		"5" = /turf/simulated/floor/asteroid,
-		"6" = /turf/space,
+		"3" = /turf/space,
+		"4" = /turf/simulated/floor/asteroid/ash/rocky,
+		"5" = /turf/simulated/floor/asteroid/ash/rocky,
+		"6" = /turf/simulated/floor/asteroid/ash,
 		"7" = /turf/space,
 		"8" = /turf/space,
 		"9" = /turf/space
@@ -33,8 +36,8 @@
 	command_spawn_message = "Welcome to the Odin! Simply proceed down and to the right to board the shuttle to your workplace!"
 
 	station_networks = list(
-		NETWORK_CIVILIAN_EAST,
-		NETWORK_CIVILIAN_WEST,
+		NETWORK_CIVILIAN_MAIN,
+		NETWORK_CIVILIAN_SURFACE,
 		NETWORK_COMMAND,
 		NETWORK_ENGINE,
 		NETWORK_ENGINEERING,
@@ -46,7 +49,9 @@
 		NETWORK_RESEARCH_OUTPOST,
 		NETWORK_ROBOTS,
 		NETWORK_PRISON,
-		NETWORK_SECURITY
+		NETWORK_SECURITY,
+		NETWORK_SERVICE,
+		NETWORK_SUPPLY
 	)
 
 	shuttle_docked_message = "The scheduled Crew Transfer Shuttle to %dock% has docked with the station. It will depart in approximately %ETA% minutes."
@@ -72,3 +77,7 @@
 	new /datum/random_map/noise/ore(null, 0, 0, 5, 64, 64)
 	new /datum/random_map/noise/ore(null, 0, 0, 4, 64, 64)
 	new /datum/random_map/noise/ore(null, 0, 0, 3, 64, 64)
+
+/datum/map/aurora/finalize_load()
+	// generate an empty space Z
+	world.maxz++

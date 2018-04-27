@@ -87,28 +87,29 @@ There are several things that need to be remembered:
 #define MUTATIONS_LAYER   1
 #define DAMAGE_LAYER      2
 #define SURGERY_LAYER     3
-#define UNIFORM_LAYER     4
-#define ID_LAYER          5
-#define SHOES_LAYER       6
-#define GLOVES_LAYER      7
-#define BELT_LAYER        8
-#define SUIT_LAYER        9
-#define TAIL_LAYER       10
-#define GLASSES_LAYER    11
-#define BELT_LAYER_ALT   12
-#define SUIT_STORE_LAYER 13
-#define BACK_LAYER       14
-#define HAIR_LAYER       15
-#define EARS_LAYER       16
-#define FACEMASK_LAYER   17
-#define HEAD_LAYER       18
-#define COLLAR_LAYER     19
-#define HANDCUFF_LAYER   20
-#define LEGCUFF_LAYER    21
-#define L_HAND_LAYER     22
-#define R_HAND_LAYER     23
-#define FIRE_LAYER       24		//If you're on fire
-#define TOTAL_LAYERS     24
+#define UNDERWEAR_LAYER   4
+#define UNIFORM_LAYER     5
+#define ID_LAYER          6
+#define SHOES_LAYER       7
+#define GLOVES_LAYER      8
+#define BELT_LAYER        9
+#define SUIT_LAYER       10
+#define TAIL_LAYER       11
+#define GLASSES_LAYER    12
+#define BELT_LAYER_ALT   13
+#define SUIT_STORE_LAYER 14
+#define BACK_LAYER       15
+#define HAIR_LAYER       16
+#define EARS_LAYER       17
+#define FACEMASK_LAYER   18
+#define HEAD_LAYER       19
+#define COLLAR_LAYER     20
+#define HANDCUFF_LAYER   21
+#define LEGCUFF_LAYER    22
+#define L_HAND_LAYER     23
+#define R_HAND_LAYER     24
+#define FIRE_LAYER       25		//If you're on fire
+#define TOTAL_LAYERS     25
 //////////////////////////////////
 
 #define UNDERSCORE_OR_NULL(target) "[target ? "[target]_" : ""]"
@@ -169,7 +170,7 @@ There are several things that need to be remembered:
 	var/damage_appearance = ""
 
 	for(var/obj/item/organ/external/O in organs)
-		if(O.is_stump())
+		if(isnull(O) || O.is_stump())
 			continue
 		//if(O.status & ORGAN_DESTROYED) damage_appearance += "d" //what is this?
 		//else
@@ -187,7 +188,7 @@ There are several things that need to be remembered:
 
 	// blend the individual damage states with our icons
 	for(var/obj/item/organ/external/O in organs)
-		if(O.is_stump())
+		if(isnull(O) || O.is_stump())
 			continue
 
 		O.update_icon()
@@ -254,22 +255,24 @@ There are several things that need to be remembered:
 		base_icon = chest.get_icon()
 
 		for(var/obj/item/organ/external/part in organs)
+			if(isnull(part) || part.is_stump())
+				continue
 			var/icon/temp = part.get_icon(skeleton)//The color comes from this function
 			//That part makes left and right legs drawn topmost and lowermost when human looks WEST or EAST
 			//And no change in rendering for other parts (they icon_position is 0, so goes to 'else' part)
 			if(part.icon_position&(LEFT|RIGHT))
 				var/icon/temp2 = new('icons/mob/human.dmi',"blank")
-				temp2.Insert(new/icon(temp,dir=NORTH),dir=NORTH)
-				temp2.Insert(new/icon(temp,dir=SOUTH),dir=SOUTH)
+				temp2.Insert(new /icon(temp ,dir = NORTH), dir = NORTH)
+				temp2.Insert(new /icon(temp, dir = SOUTH), dir = SOUTH)
 				if(!(part.icon_position & LEFT))
-					temp2.Insert(new/icon(temp,dir=EAST),dir=EAST)
+					temp2.Insert(new /icon(temp, dir = EAST), dir = EAST)
 				if(!(part.icon_position & RIGHT))
-					temp2.Insert(new/icon(temp,dir=WEST),dir=WEST)
+					temp2.Insert(new /icon(temp, dir = WEST), dir = WEST)
 				base_icon.Blend(temp2, ICON_OVERLAY)
 				if(part.icon_position & LEFT)
-					temp2.Insert(new/icon(temp,dir=EAST),dir=EAST)
+					temp2.Insert(new /icon(temp, dir = EAST), dir = EAST)
 				if(part.icon_position & RIGHT)
-					temp2.Insert(new/icon(temp,dir=WEST),dir=WEST)
+					temp2.Insert(new /icon(temp, dir = WEST), dir = WEST)
 				base_icon.Blend(temp2, ICON_UNDERLAY)
 			else
 				base_icon.Blend(temp, ICON_OVERLAY)
@@ -294,36 +297,28 @@ There are several things that need to be remembered:
 	//END CACHED ICON GENERATION.
 	stand_icon.Blend(base_icon,ICON_OVERLAY)
 
-	//Underwear
-	if(underwear && species.appearance_flags & HAS_UNDERWEAR)
-		var/uwear = "[underwear]"
-		var/icon/undies = SSicon_cache.human_underwear_cache[uwear]
-		if (!undies)
-			undies = new('icons/mob/human.dmi', underwear)
-			SSicon_cache.human_underwear_cache[uwear] = undies
-		stand_icon.Blend(undies, ICON_OVERLAY)
-
-	if(undershirt && species.appearance_flags & HAS_UNDERWEAR)
-		var/ushirt = "[undershirt]"
-		var/icon/shirt = SSicon_cache.human_undershirt_cache[ushirt]
-		if (!shirt)
-			shirt = new('icons/mob/human.dmi', undershirt)
-			SSicon_cache.human_undershirt_cache[ushirt] = shirt
-		stand_icon.Blend(shirt, ICON_OVERLAY)
-
-	if(socks && species.appearance_flags & HAS_SOCKS)
-		var/sockskey = "[socks]"
-		var/icon/socksicon = SSicon_cache.human_socks_cache[sockskey]
-		if (!socksicon)
-			socksicon = new('icons/mob/human.dmi', socks)
-			SSicon_cache.human_socks_cache[sockskey] = socksicon
-		stand_icon.Blend(socksicon, ICON_OVERLAY)
-
 	if(update_icons)
 		update_icons()
 
 	//tail
 	update_tail_showing(0)
+
+/mob/living/carbon/human/proc/update_underwear(update_icons = TRUE)
+	var/list/ovr
+
+	if(underwear && (species.appearance_flags & HAS_UNDERWEAR))
+		LAZYADD(ovr, SSicon_cache.get_state('icons/mob/human.dmi', "[underwear]"))
+
+	if(undershirt && (species.appearance_flags & HAS_UNDERWEAR))
+		LAZYADD(ovr, SSicon_cache.get_state('icons/mob/human.dmi', "[undershirt]"))
+
+	if(socks && (species.appearance_flags & HAS_SOCKS))
+		LAZYADD(ovr, SSicon_cache.get_state('icons/mob/human.dmi', "[socks]"))
+
+	overlays_raw[UNDERWEAR_LAYER] = ovr
+
+	if (update_icons)
+		update_icons()
 
 // This proc generates & returns an icon representing a human's hair, using a cached icon from SSicon_cache if possible.
 // If `hair_is_visible` is FALSE, only facial hair will be drawn.
@@ -332,14 +327,14 @@ There are several things that need to be remembered:
 
 	var/icon/face_standing = SSicon_cache.human_hair_cache[cache_key]
 	if (!face_standing)	// Not cached, generate it from scratch.
-		face_standing = new /icon('icons/mob/human_face.dmi',"bald_s")
+		face_standing = new /icon('icons/mob/human_face/hair.dmi',"bald")
 		// Beard.
 		if(f_style)
 			var/datum/sprite_accessory/facial_hair_style = facial_hair_styles_list[f_style]
 			if(facial_hair_style && facial_hair_style.species_allowed && (GET_BODY_TYPE in facial_hair_style.species_allowed))
-				var/icon/facial_s = new/icon("icon" = facial_hair_style.icon, "icon_state" = "[facial_hair_style.icon_state]_s")
+				var/icon/facial_s = new/icon("icon" = facial_hair_style.icon, "icon_state" = facial_hair_style.icon_state)
 				if(facial_hair_style.do_colouration)
-					facial_s.Blend(rgb(r_facial, g_facial, b_facial), ICON_ADD)
+					facial_s.Blend(rgb(r_facial, g_facial, b_facial), facial_hair_style.icon_blend_mode)
 
 				face_standing.Blend(facial_s, ICON_OVERLAY)
 
@@ -347,9 +342,9 @@ There are several things that need to be remembered:
 		if(hair_is_visible)
 			var/datum/sprite_accessory/hair_style = hair_styles_list[h_style]
 			if(hair_style && (GET_BODY_TYPE in hair_style.species_allowed))
-				var/icon/hair_s = new/icon("icon" = hair_style.icon, "icon_state" = "[hair_style.icon_state]_s")
+				var/icon/hair_s = new/icon("icon" = hair_style.icon, "icon_state" = hair_style.icon_state)
 				if(hair_style.do_colouration)
-					hair_s.Blend(rgb(r_hair, g_hair, b_hair), ICON_ADD)
+					hair_s.Blend(rgb(r_hair, g_hair, b_hair), hair_style.icon_blend_mode)
 
 				face_standing.Blend(hair_s, ICON_OVERLAY)
 
@@ -385,7 +380,7 @@ There are several things that need to be remembered:
 		if (has_visible_hair)
 			var/datum/sprite_accessory/hair_style = hair_styles_list[h_style]
 			if (hair_style)
-				var/col = species.get_light_color(h_style) || "#FFFFFF"
+				var/col = species.get_light_color(src) || "#FFFFFF"
 				set_light(species.light_range, species.light_power, col, uv = 0, angle = LIGHT_WIDE)
 		else
 			set_light(0)
@@ -449,30 +444,33 @@ There are several things that need to be remembered:
 		return
 
 	..()
-	if(transforming)		return
 
-	update_mutations(0)
-	update_body(0)
-	update_hair(0)
-	update_inv_w_uniform(0)
-	update_inv_wear_id(0)
-	update_inv_gloves(0)
-	update_inv_glasses(0)
-	update_inv_ears(0)
-	update_inv_shoes(0)
-	update_inv_s_store(0)
-	update_inv_wear_mask(0)
-	update_inv_head(0)
-	update_inv_belt(0)
-	update_inv_back(0)
-	update_inv_wear_suit(0)
-	update_inv_r_hand(0)
-	update_inv_l_hand(0)
-	update_inv_handcuffed(0)
-	update_inv_legcuffed(0)
-	update_inv_pockets(0)
-	update_fire(0)
-	update_surgery(0)
+	if(transforming)
+		return
+
+	update_mutations(FALSE)
+	update_body(FALSE)
+	update_hair(FALSE)
+	update_inv_w_uniform(FALSE)
+	update_inv_wear_id(FALSE)
+	update_inv_gloves(FALSE)
+	update_inv_glasses(FALSE)
+	update_inv_ears(FALSE)
+	update_inv_shoes(FALSE)
+	update_inv_s_store(FALSE)
+	update_inv_wear_mask(FALSE)
+	update_inv_head(FALSE)
+	update_inv_belt(FALSE)
+	update_inv_back(FALSE)
+	update_inv_wear_suit(FALSE)
+	update_inv_r_hand(FALSE)
+	update_inv_l_hand(FALSE)
+	update_inv_handcuffed(FALSE)
+	update_inv_legcuffed(FALSE)
+	update_inv_pockets(FALSE)
+	update_fire(FALSE)
+	update_surgery(FALSE)
+	update_underwear(FALSE)
 	UpdateDamageIcon()
 	update_icons()
 	//Hud Stuff
@@ -731,7 +729,7 @@ There are several things that need to be remembered:
 	if(update_icons)   update_icons()
 
 
-/mob/living/carbon/human/update_inv_head(var/update_icons=1)
+/mob/living/carbon/human/update_inv_head(update_icons = TRUE, recurse = TRUE)
 	if (QDELING(src))
 		return
 
@@ -778,6 +776,10 @@ There are several things that need to be remembered:
 				ovr += SSicon_cache.light_overlay_cache["[cache_key]"]
 
 		overlays_raw[HEAD_LAYER] = ovr || standing
+
+	if (recurse)
+		update_hair(FALSE)
+		update_inv_wear_mask(FALSE, FALSE)
 
 	if(update_icons)
 		update_icons()
@@ -903,7 +905,7 @@ There are several things that need to be remembered:
 		update_icons()
 
 
-/mob/living/carbon/human/update_inv_wear_mask(var/update_icons=1)
+/mob/living/carbon/human/update_inv_wear_mask(update_icons = TRUE, recurse = TRUE)
 	if (QDELING(src))
 		return
 
@@ -936,6 +938,10 @@ There are several things that need to be remembered:
 			ovr = list(standing, bloodsies)
 
 		overlays_raw[FACEMASK_LAYER] = ovr || standing
+
+	if (recurse)
+		update_inv_head(FALSE, FALSE)
+		update_hair(FALSE)
 
 	if(update_icons)
 		update_icons()

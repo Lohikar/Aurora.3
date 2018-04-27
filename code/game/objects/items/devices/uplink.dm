@@ -318,16 +318,16 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 // Includes normal radio uplink, multitool uplink,
 // implant uplink (not the implant tool) and a preset headset uplink.
 
-/obj/item/device/radio/uplink/New()
-	hidden_uplink = new(src)
+/obj/item/device/radio/uplink/New(var/loc, var/mind)
+	hidden_uplink = new(src, mind)
 	icon_state = "radio"
 
 /obj/item/device/radio/uplink/attack_self(mob/user as mob)
 	if(hidden_uplink)
 		hidden_uplink.trigger(user)
 
-/obj/item/device/multitool/uplink/New()
-	hidden_uplink = new(src)
+/obj/item/device/multitool/uplink/New(var/loc, var/mind)
+	hidden_uplink = new(src, mind)
 
 /obj/item/device/multitool/uplink/attack_self(mob/user as mob)
 	if(hidden_uplink)
@@ -336,9 +336,9 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 /obj/item/device/radio/headset/uplink
 	traitor_frequency = 1445
 
-/obj/item/device/radio/headset/uplink/New()
+/obj/item/device/radio/headset/uplink/New(var/loc, var/mind)
 	..()
-	hidden_uplink = new(src)
+	hidden_uplink = new(src, mind)
 	hidden_uplink.uses = DEFAULT_TELECRYSTAL_AMOUNT
 
 /*
@@ -353,9 +353,9 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 	flags = CONDUCT
 	w_class = 2
 
-/obj/item/device/contract_uplink/New()
+/obj/item/device/contract_uplink/New(var/loc, var/mind)
 	..()
-	hidden_uplink = new(src)
+	hidden_uplink = new(src, mind)
 	hidden_uplink.uses = 0
 	hidden_uplink.nanoui_menu = 3
 
@@ -385,4 +385,24 @@ A list of items and costs is stored under the datum of every game mode, alongsid
 		return
 
 	command_announcement.Announce("[message]", title, new_sound = 'sound/AI/commandreport.ogg', msg_sanitized = 1);
+	discord_bot.send_to_cciaa("Announcer - Fake announcement:`[title]` - `[message]`, sent by [user]!")
 	qdel(src)
+
+//ninja
+/obj/item/device/ninja_uplink
+	name = "infiltrator uplink"
+	desc = "A small device used for access to a restricted cache of specialized items."
+	icon = 'icons/obj/radio.dmi'
+	icon_state = "radio"
+	flags = CONDUCT
+	w_class = 2
+
+/obj/item/device/ninja_uplink/New(var/loc, var/mind)
+	..()
+	hidden_uplink = new(src, mind)
+	hidden_uplink.uses = DEFAULT_TELECRYSTAL_AMOUNT
+	hidden_uplink.nanoui_menu = 1
+
+/obj/item/device/ninja_uplink/attack_self(mob/user as mob)
+	if (hidden_uplink)
+		hidden_uplink.trigger(user)

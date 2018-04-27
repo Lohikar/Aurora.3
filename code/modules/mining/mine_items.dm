@@ -25,6 +25,8 @@
 	new /obj/item/weapon/shovel(src)
 	new /obj/item/weapon/pickaxe(src)
 	new /obj/item/weapon/ore_radar(src)
+	new /obj/item/weapon/key/minecarts(src)
+	new /obj/item/device/gps/mining(src)
 
 /******************************Lantern*******************************/
 
@@ -593,10 +595,10 @@
 	cell = new /obj/item/weapon/cell/high(src)
 	key = null
 	var/image/I = new(icon = 'icons/obj/cart.dmi', icon_state = "[icon_state]_overlay", layer = src.layer + 0.2) //over mobs
-	overlays += I
+	add_overlay(I)
 	turn_off()	//so engine verbs are correctly set
 
-/obj/vehicle/train/cargo/engine/attackby(obj/item/weapon/W as obj, mob/user as mob)
+/obj/vehicle/train/cargo/engine/mining/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/weapon/key/minecarts))
 		if(!key)
 			user.drop_item()
@@ -1127,10 +1129,13 @@ var/list/total_extraction_beacons = list()
 
 /obj/item/weapon/oreportal/attack_self(mob/user)
 	user << "<span class='info'>You pulse the ore summoner.</span>"
+	var/limit = 10
 	for(var/obj/item/weapon/ore/O in orange(7,user))
+		if(limit <= 0)
+			break
 		single_spark(O.loc)
 		do_teleport(O, user, 0)
-
+		limit -= 1
 		CHECK_TICK
 
 /******************************Sculpting*******************************/
@@ -1282,7 +1287,7 @@ var/list/total_extraction_beacons = list()
 		user.loc = src.loc
 		var/image/W = image('icons/obj/mining.dmi',"fitnessweight-w")
 		W.layer = 5.1
-		overlays += W
+		add_overlay(W)
 		var/bragmessage = pick("pushing it to the limit","going into overdrive","burning with determination","rising up to the challenge", "getting strong now","getting ripped")
 		user.visible_message("<B>[user] is [bragmessage]!</B>")
 		var/reps = 0
@@ -1305,7 +1310,7 @@ var/list/total_extraction_beacons = list()
 		animate(user, pixel_y = 0, time = 3)
 		var/finishmessage = pick("You feel stronger!","You feel like you can take on the world!","You feel robust!","You feel indestructible!")
 		icon_state = "fitnessweight"
-		overlays -= W
+		cut_overlay(W)
 		user << "[finishmessage]"
 		user.nutrition = user.nutrition - 10
 

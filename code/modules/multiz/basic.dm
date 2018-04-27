@@ -17,44 +17,51 @@ var/z_levels = 0 // Each bit represents a connection between adjacent levels.  S
 	SSatlas.height_markers -= src
 	return ..()
 
-// The storage of connections between adjacent levels means some bitwise magic is needed.
+// Legacy shims.
 /proc/HasAbove(var/z)
-	if(z >= world.maxz || z > 16 || z < 1)
-		return 0
-	return z_levels & (1 << (z - 1))
+	return HAS_ABOVE(z)
 
 /proc/HasBelow(var/z)
-	if(z > world.maxz || z > 17 || z < 2)
-		return 0
-	return z_levels & (1 << (z - 2))
+	return HAS_BELOW(z)
 
 // Thankfully, no bitwise magic is needed here.
-/proc/GetAbove(var/atom/atom)
-	var/turf/turf = get_turf(atom)
-	if(!turf)
-		return null
-	return HasAbove(turf.z) ? get_step(turf, UP) : null
+/proc/GetAbove(atom/A)
+	return A ? GET_ABOVE(A) : null
 
-/proc/GetBelow(var/atom/atom)
-	var/turf/turf = get_turf(atom)
-	if(!turf)
-		return null
-	return HasBelow(turf.z) ? get_step(turf, DOWN) : null
+/proc/GetBelow(atom/A)
+	return A ? GET_BELOW(A) : null
 
 /proc/GetConnectedZlevels(z)
 	. = list(z)
-	for(var/level = z, HasBelow(level), level--)
-		. |= level-1
-	for(var/level = z, HasAbove(level), level++)
-		. |= level+1
+	for(var/level = z, HAS_BELOW(level), level--)
+		. += level-1
+	for(var/level = z, HAS_ABOVE(level), level++)
+		. += level+1
 
-proc/AreConnectedZLevels(var/zA, var/zB)
-	return zA == zB || (zB in GetConnectedZlevels(zA))
+/proc/AreConnectedZLevels(var/zA, var/zB)
+	if (zA == zB)
+		return TRUE
+
+	if (SSatlas.connected_z_cache.len >= zA && SSatlas.connected_z_cache[zA])
+		return SSatlas.connected_z_cache[zA][zB]
+
+	var/list/levels = GetConnectedZlevels(zA)
+	var/list/new_entry = new(max(levels))
+	for (var/entry in levels)
+		new_entry[entry] = TRUE
+
+	if (SSatlas.connected_z_cache.len < zA)
+		SSatlas.connected_z_cache.len = zA
+
+	SSatlas.connected_z_cache[zA] = new_entry
+
+	return new_entry[zB]
 
 /proc/get_zstep(ref, dir)
-	if(dir == UP)
-		. = GetAbove(ref)
-	else if (dir == DOWN)
-		. = GetBelow(ref)
-	else
-		. = get_step(ref, dir)
+	switch (dir)
+		if (UP)
+			. = GET_ABOVE(ref)
+		if (DOWN)
+			. = GET_BELOW(ref)
+		else
+			. = get_step(ref, dir)

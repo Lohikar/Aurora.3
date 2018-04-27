@@ -2,6 +2,7 @@
 	density = 1
 	anchored = 1
 	icon = 'icons/obj/cult.dmi'
+	appearance_flags = NO_CLIENT_COLOR
 
 /obj/structure/cult/cultify()
 	return
@@ -391,7 +392,7 @@
 		A = new /obj/item/projectile/beam/cult(loc)
 		playsound(loc, 'sound/weapons/laserdeep.ogg', 65, 1)
 	A.ignore = sacrificer
-	A.launch(target)
+	A.launch_projectile(target)
 	next_shot = world.time + shot_delay
 	A = null //So projectiles can GC
 	spawn(shot_delay+1)
@@ -600,14 +601,10 @@
 	anchored = 1.0
 	var/spawnable = null
 
-/obj/effect/gateway/Bumped(mob/M as mob|obj)
-	spawn(0)
-		return
+/obj/effect/gateway/CollidedWith(mob/M)
 	return
 
 /obj/effect/gateway/Crossed(AM as mob|obj)
-	spawn(0)
-		return
 	return
 
 /obj/effect/gateway/active
@@ -627,6 +624,7 @@
 		/mob/living/simple_animal/hostile/creature/cult,
 		/mob/living/simple_animal/hostile/faithless/cult
 	)
+	appearance_flags = NO_CLIENT_COLOR
 
 /obj/effect/gateway/active/cult/cultify()
 	return

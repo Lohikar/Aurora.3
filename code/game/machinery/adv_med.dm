@@ -269,7 +269,9 @@
 
 /obj/machinery/body_scanconsole/Initialize()
 	. = ..()
-	src.connected = locate(/obj/machinery/bodyscanner, get_step(src, WEST))
+	for(var/obj/machinery/bodyscanner/C in orange(1,src))
+		connected = C
+		break
 	src.connected.connected = src
 
 /obj/machinery/body_scanconsole/attack_ai(user as mob)
@@ -332,7 +334,7 @@
 		data["dexAmt"] 			= R.get_reagent_amount("dexalin")
 		data["dermAmt"]			= R.get_reagent_amount("dermaline")
 		data["otherAmt"]		= R.total_volume - (data["soporAmt"] + data["dexAmt"] + data["bicardAmt"] + data["inaprovAmt"] + data["dermAmt"])
-		data["brainDmgStatus"] 	= val2status(occupant.brainloss, 20, 50)
+		data["brainDmgStatus"] 	= val2status(occupant.getBrainLoss(), 20, 50)
 		data["radStatus"] 		= val2status(occupant.total_radiation)
 		data["cloneDmgStatus"] 	= val2status(occupant.cloneloss, 10, 35)
 		data["bodyparts"]		= get_organ_wound_data(occupant)

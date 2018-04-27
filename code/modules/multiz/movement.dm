@@ -62,7 +62,7 @@
 
 	// If we want to move up,but the current area has gravity. Invoke CanAvoidGravity()
 	// to check if this move is possible.
-	if(direction == UP && area.has_gravity && !CanAvoidGravity())
+	if(direction == UP && area.has_gravity() && !CanAvoidGravity())
 		to_chat(src, "<span class='warning'>Gravity stops you from moving upward.</span>")
 		return FALSE
 
@@ -84,14 +84,14 @@
 
 	return ..()
 
-/mob/eye/zMove(direction)
+/mob/abstract/eye/zMove(direction)
 	var/turf/destination = (direction == UP) ? GetAbove(src) : GetBelow(src)
 	if(destination)
 		setLoc(destination)
 	else
 		to_chat(owner, "<span class='notice'>There is nothing of interest in this direction.</span>")
 
-/mob/dead/observer/zMove(direction)
+/mob/abstract/observer/zMove(direction)
 	var/turf/destination = (direction == UP) ? GetAbove(src) : GetBelow(src)
 	if(destination)
 		forceMove(destination)
@@ -116,7 +116,7 @@
 /mob/proc/can_ztravel(var/direction)
 	return FALSE
 
-/mob/dead/observer/can_ztravel(var/direction)
+/mob/abstract/observer/can_ztravel(var/direction)
 	return TRUE
 
 /mob/living/carbon/human/can_ztravel(var/direction)
@@ -200,11 +200,10 @@
 		return FALSE
 
 	// Lattices, ladders, and stairs stop things from falling.
-	if(locate(/obj/structure/lattice, dest) || locate(/obj/structure/stairs, dest) || locate(/obj/structure/ladder, dest))
+	if(locate(/obj/structure/lattice, dest) || locate(/obj/structure/stairs, dest))
 		return FALSE
 
-	//Ladders too
-	if(below && locate(/obj/structure/ladder) in below)
+	if(ismob(src) && locate(/obj/structure/ladder, dest)) //hmmm how is this locker just floating here?
 		return FALSE
 
 	// The var/climbers API is implemented here.
@@ -263,7 +262,7 @@
 /mob/living/carbon/human/bst/can_fall()
 	return fall_override ? FALSE : ..()
 
-/mob/eye/can_fall()
+/mob/abstract/eye/can_fall()
 	return FALSE
 
 /mob/living/silicon/robot/can_fall(turf/below, turf/simulated/open/dest = src.loc)
@@ -315,7 +314,7 @@
 /atom/movable/proc/fall_impact(levels_fallen, stopped_early = FALSE)
 	// No gravity, stop falling into spess!
 	var/area/area = get_area(src)
-	if (istype(loc, /turf/space) || (area && !area.has_gravity))
+	if (istype(loc, /turf/space) || (area && !area.has_gravity()))
 		return FALSE
 
 	visible_message("\The [src] falls and lands on \the [loc]!", "You hear a thud!")
@@ -326,7 +325,7 @@
 /mob/living/fall_impact(levels_fallen, stopped_early = FALSE)
 	// No gravity, stop falling into spess!
 	var/area/area = get_area(src)
-	if (istype(loc, /turf/space) || (area && !area.has_gravity))
+	if (istype(loc, /turf/space) || (area && !area.has_gravity()))
 		return FALSE
 
 	visible_message("\The [src] falls and lands on \the [loc]!",
@@ -355,7 +354,7 @@
 /mob/living/carbon/human/fall_impact(levels_fallen, stopped_early = FALSE)
 	// No gravity, stop falling into spess!
 	var/area/area = get_area(src)
-	if (istype(loc, /turf/space) || (area && !area.has_gravity))
+	if (istype(loc, /turf/space) || (area && !area.has_gravity()))
 		return FALSE
 
 	var/obj/item/weapon/rig/rig = get_rig()
@@ -504,7 +503,7 @@
 /atom/movable/proc/fall_collateral(levels_fallen, stopped_early = FALSE)
 	// No gravity, stop falling into spess!
 	var/area/area = get_area(src)
-	if (istype(loc, /turf/space) || (area && !area.has_gravity))
+	if (istype(loc, /turf/space) || (area && !area.has_gravity()))
 		return null
 
 	var/list/fall_specs = fall_get_specs(levels_fallen)

@@ -1,7 +1,7 @@
 /mob/proc/on_mob_jump()
 	return
 
-/mob/dead/observer/on_mob_jump()
+/mob/abstract/observer/on_mob_jump()
 	stop_following()
 
 /client/proc/Jump(var/area/A in all_areas)
@@ -49,7 +49,7 @@
 		if(src.mob)
 			var/mob/A = src.mob
 			var/turf/T = get_turf(M)
-			if(T && isturf(T))
+			if(isturf(T))
 				feedback_add_details("admin_verb","JM") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 				A.on_mob_jump()
 				A.loc = T

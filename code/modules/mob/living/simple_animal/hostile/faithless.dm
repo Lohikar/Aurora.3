@@ -35,6 +35,8 @@
 
 	faction = "faithless"
 
+	flying = TRUE
+
 /mob/living/simple_animal/hostile/faithless/Allow_Spacemove(var/check_drift = 0)
 	return 1
 
@@ -51,17 +53,9 @@
 			L.Weaken(3)
 			L.visible_message("<span class='danger'>\the [src] knocks down \the [L]!</span>")
 
-/mob/living/simple_animal/hostile/faithless/can_fall()
-	return FALSE
-
-/mob/living/simple_animal/hostile/faithless/can_ztravel()
-	return TRUE
-
-/mob/living/simple_animal/hostile/faithless/CanAvoidGravity()
-	return TRUE
-
 /mob/living/simple_animal/hostile/faithless/cult
 	faction = "cult"
+	appearance_flags = NO_CLIENT_COLOR
 
 /mob/living/simple_animal/hostile/faithless/cult/cultify()
 	return

@@ -11,6 +11,7 @@
 	if(touching) touching.metabolize()
 	if(ingested) ingested.metabolize()
 	if(bloodstr) bloodstr.metabolize()
+	if(breathing) breathing.metabolize()
 
 	// nutrition decrease
 	if (nutrition > 0 && stat != 2)
@@ -36,5 +37,10 @@
 	if (!gestalt)
 		..()
 
-
-
+/mob/living/carbon/alien/diona/think()
+	..()
+	if (!gestalt)
+		if(master_nymph && !client && master_nymph != src)
+			walk_to(src,master_nymph,1,movement_delay())
+		else
+			walk_to(src,0)

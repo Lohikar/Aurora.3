@@ -146,7 +146,7 @@
 		return 1
 	return ..()
 
-/obj/machinery/portable_atmospherics/hydroponics/attack_ghost(var/mob/dead/observer/user)
+/obj/machinery/portable_atmospherics/hydroponics/attack_ghost(var/mob/abstract/observer/user)
 
 	if(!(harvest && seed && seed.has_mob_product))
 		return
@@ -233,6 +233,10 @@
 	harvest = 0
 	weedlevel += 1 * HYDRO_SPEED_MULTIPLIER
 	pestlevel = 0
+	if(prob(min(25,max(1,seed.get_trait(TRAIT_POTENCY/2)))))
+		if(seed.get_trait(TRAIT_SPOROUS) && !closed_system)
+			seed.create_spores(get_turf(src))
+			visible_message("<span class='danger'>\The [src] releases its spores!</span>")
 
 //Process reagents being input into the tray.
 /obj/machinery/portable_atmospherics/hydroponics/proc/process_reagents()
@@ -301,6 +305,9 @@
 	else
 		seed.harvest(get_turf(src),yield_mod)
 	// Reset values.
+	if(seed.get_trait(TRAIT_SPOROUS))
+		seed.create_spores(get_turf(src))
+		visible_message("<span class='danger'>\The [src] releases its spores!</span>")
 	harvest = 0
 	lastproduce = age
 
@@ -572,7 +579,10 @@
 		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 		user.visible_message("<span class='danger'>\The [seed.display_name] has been attacked by [user] with \the [O]!</span>")
 		if(!dead)
-			health -= O.force
+			var/total_damage = O.force
+			if ((O.sharp) || (O.damtype == "fire")) //fire and sharp things are more effective when dealing with plants
+				total_damage = 2*O.force
+			health -= total_damage
 			check_health()
 	return
 
@@ -637,10 +647,11 @@
 			light_string = "that the internal lights are set to [tray_light] lumens"
 		else
 			var/light_available
-			if(T.dynamic_lighting)
+			if(TURF_IS_DYNAMICALLY_LIT(T))
 				light_available = T.get_lumcount(0, 3) * 10
 			else
-				light_available =  5
+				light_available = 5
+
 			light_string = "a light level of [light_available] lumens"
 
 		usr << "The tray's sensor suite is reporting [light_string] and a temperature of [environment.temperature]K."

@@ -62,32 +62,30 @@
 		else
 			message_admins("[key_name(user, user.client)](<A HREF='?_src_=holder;adminmoreinfo=\ref[user]'>?</A>) planted [src.name] on [target.name] at ([target.x],[target.y],[target.z] - <A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[target.x];Y=[target.y];Z=[target.z]'>JMP</a>) with [timer] second fuse",0,1)
 			log_game("[key_name(user)] planted [src.name] on [target.name] at ([target.x],[target.y],[target.z]) with [timer] second fuse",ckey=key_name(user))
-		
+
 		target.add_overlay(image_overlay, TRUE)
 		user << "Bomb has been planted. Timer counting down from [timer]."
 
 		addtimer(CALLBACK(src, .proc/explode, get_turf(target)), timer * 10)
 
 /obj/item/weapon/plastique/proc/explode(turf/location)
-	target.cut_overlay(image_overlay, TRUE)
-
 	if(!target)
 		target = get_atom_on_turf(src)
 	if(!target)
 		target = src
+	target.cut_overlay(image_overlay, TRUE)
 	if(location)
-		explosion(location, -1, -1, 2, 3, is_rec = 0)
+		explosion(location, -1, -1, 2, 3, spreading = 0)
 
 	if(target)
 		if (istype(target, /turf/simulated/wall))
 			var/turf/simulated/wall/W = target
-			W.dismantle_wall(1)
+			W.dismantle_wall(1, no_product = TRUE)
 		else if(istype(target, /mob/living))
 			target.ex_act(2) // c4 can't gib mobs anymore.
 		else
 			target.ex_act(1)
-	if(target)
-		target.overlays -= image_overlay
+
 	qdel(src)
 
 /obj/item/weapon/plastique/attack(mob/M as mob, mob/user as mob, def_zone)

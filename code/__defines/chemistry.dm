@@ -3,6 +3,7 @@
 #define CHEM_TOUCH 1
 #define CHEM_INGEST 2
 #define CHEM_BLOOD 3
+#define CHEM_BREATHE 4
 
 #define MINIMUM_CHEMICAL_VOLUME 0.01
 
@@ -23,6 +24,7 @@
 #define IS_XENOS   32
 #define IS_MACHINE 64
 #define IS_VAURCA  128
+#define IS_UNDEAD  256
 
 #define CE_STABLE "stable" // Inaprovaline
 #define CE_ANTIBIOTIC "antibiotic" // Spaceacilin

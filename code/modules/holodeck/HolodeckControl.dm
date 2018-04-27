@@ -180,6 +180,10 @@
 			if (get_area(C.loc) != linkedholodeck)
 				holographic_mobs -= C
 				C.derez()
+		for(var/mob/living/simple_animal/penguin/holodeck/P in holographic_mobs)
+			if (get_area(P.loc) != linkedholodeck)
+				holographic_mobs -= P
+				P.derez()
 
 	if(inoperable())
 		return
@@ -233,7 +237,7 @@
 		loadProgram(current_map.holodeck_programs["turnoff"], 0)
 
 		if(!linkedholodeck.has_gravity)
-			linkedholodeck.gravitychange(1,linkedholodeck)
+			linkedholodeck.gravitychange(TRUE)
 
 		active = 0
 		use_power = 1
@@ -266,6 +270,10 @@
 		holographic_mobs -= C
 		C.derez()
 
+	for(var/mob/living/simple_animal/penguin/holodeck/P in holographic_mobs)
+		holographic_mobs -= P
+		P.derez()
+
 	for(var/obj/effect/decal/cleanable/blood/B in linkedholodeck)
 		qdel(B)
 
@@ -296,6 +304,15 @@
 			if(L.name=="Holocarp Spawn")
 				holographic_mobs += new /mob/living/simple_animal/hostile/carp/holodeck(L.loc)
 
+			if(L.name=="Penguin Spawn Random")
+				if (prob(50))
+					holographic_mobs += new /mob/living/simple_animal/penguin/holodeck(L.loc)
+				else
+					holographic_mobs += new /mob/living/simple_animal/penguin/holodeck/baby(L.loc)
+
+			if(L.name=="Penguin Spawn Emperor")
+				holographic_mobs += new /mob/living/simple_animal/penguin/holodeck/emperor(L.loc)
+
 			if(L.name=="Holocarp Spawn Random")
 				if (prob(4)) //With 4 spawn points, carp should only appear 15% of the time.
 					holographic_mobs += new /mob/living/simple_animal/hostile/carp/holodeck(L.loc)
@@ -316,17 +333,17 @@
 	active = 1
 	use_power = 1
 
-	if(A.has_gravity)
-		A.gravitychange(0,A)
+	if(A.has_gravity())
+		A.gravitychange(FALSE)
 	else
-		A.gravitychange(1,A)
+		A.gravitychange(TRUE)
 
 /obj/machinery/computer/HolodeckControl/proc/emergencyShutdown()
 	//Turn it back to the regular non-holographic room
 	loadProgram(current_map.holodeck_programs["turnoff"], 0)
 
 	if(!linkedholodeck.has_gravity)
-		linkedholodeck.gravitychange(1,linkedholodeck)
+		linkedholodeck.gravitychange(TRUE)
 
 	active = 0
 	use_power = 1

@@ -183,14 +183,14 @@
 	if(!mob)
 		return // Moved here to avoid nullrefs below
 
-	if(mob.control_object)	
+	if(mob.control_object)
 		Move_object(direct)
 
 	if(mob.incorporeal_move && isobserver(mob))
 		Process_Incorpmove(direct)
 		return
 
-	if(moving || world.time < move_delay) 
+	if(moving || world.time < move_delay)
 		return 0
 
 	//This compensates for the inaccuracy of move ticks
@@ -210,7 +210,7 @@
 	if(mob.eyeobj)
 		return mob.EyeMove(n,direct)
 
-	if(mob.transforming)	
+	if(mob.transforming)
 		return	//This is sota the goto stop mobs from moving var
 
 	if(isliving(mob))
@@ -224,9 +224,9 @@
 				if(item.zoom)
 					item.zoom(mob)
 					break
-		
+
 		// Only meaningful for living mobs.
-		if(Process_Grab())	
+		if(Process_Grab())
 			return
 
 	if(!mob.canmove)
@@ -436,7 +436,7 @@
 
 	if(!lastarea)
 		lastarea = get_area(loc)
-	if(!lastarea.has_gravity)
+	if(!lastarea.has_gravity())
 		return 0
 
 	return 1
@@ -451,7 +451,7 @@
 			return 1
 		else
 			var/area/A = T.loc
-			if(A.has_gravity || shoegrip)
+			if(A.has_gravity() || shoegrip)
 				return 1
 
 	for(var/obj/O in orange(1, src))
