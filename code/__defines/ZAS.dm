@@ -14,7 +14,7 @@
 #define CANPASS_PROC 3
 #define CANPASS_NEVER 4
 
-#define TURF_HAS_VALID_ZONE(T) (istype(T, /turf/simulated) && T:zone && !T:zone:invalid)
+#define TURF_HAS_VALID_ZONE(T) (issimulated(T) && T:zone && !T:zone:invalid)
 
 #ifdef MULTIZAS
 

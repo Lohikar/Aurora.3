@@ -27,6 +27,7 @@ var/list/mineral_can_smooth_with = list(
 	gender = PLURAL
 	var/icon/actual_icon = 'icons/turf/smooth/rock_wall.dmi'
 	layer = 2.01
+	fake_unsim = TRUE
 
 	// canSmoothWith is set in Initialize().
 	smooth = SMOOTH_MORE | SMOOTH_BORDER | SMOOTH_NO_CLEAR_ICON
@@ -448,6 +449,9 @@ var/list/mineral_can_smooth_with = list(
 				var/obj/item/stack/material/uranium/R = new(src)
 				R.amount = rand(5,25)
 
+/turf/simulated/mineral/update_air_properties()
+	return 1
+
 /turf/simulated/mineral/random
 	name = "Mineral deposit"
 	var/mineralSpawnChanceList = list(
@@ -525,6 +529,7 @@ var/list/mineral_can_smooth_with = list(
 	footstep_sound = "gravelstep"
 
 	roof_type = null
+	fake_unsim = TRUE
 
 // Same as the other, this is a global so we don't have a lot of pointless lists floating around.
 // Basalt is explicitly omitted so ash will spill onto basalt turfs.
@@ -570,6 +575,40 @@ var/list/asteroid_floor_smooth = list(
 		update_light()
 
 	return INITIALIZE_HINT_NORMAL
+
+/turf/simulated/floor/asteroid/update_air_properties()
+	var/block
+	ATMOS_CANPASS_TURF(block, src, src)
+	if(block & AIR_BLOCKED)
+		//dbg(blocked)
+		return 1
+
+	#ifdef MULTIZAS
+	for(var/d = 1, d < 64, d *= 2)
+	#else
+	for(var/d = 1, d < 16, d *= 2)
+	#endif
+		var/turf/unsim = get_step(src, d)
+
+		if(!unsim)
+			continue
+
+		ATMOS_CANPASS_TURF(block, unsim, src)
+
+		if(block & AIR_BLOCKED)
+			//unsim.dbg(air_blocked, turn(180,d))
+			continue
+
+		var/r_block
+		ATMOS_CANPASS_TURF(r_block, src, unsim)
+
+		if(r_block & AIR_BLOCKED)
+			continue
+
+		if(issimulated(unsim))
+			var/turf/simulated/sim = unsim
+			if(TURF_HAS_VALID_ZONE(sim))
+				SSair.connect(sim, src)
 
 /turf/simulated/floor/asteroid/ex_act(severity)
 	switch(severity)

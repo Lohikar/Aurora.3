@@ -139,7 +139,8 @@ Class Procs:
 	var/simulated_turf_count = 0
 	for(var/turf/simulated/S in turfs)
 		simulated_turf_count++
-		S.update_air_properties()
+		if (!S.always_block)
+			S.update_air_properties()
 
 		CHECK_TICK
 
@@ -333,7 +334,7 @@ Total Unsimulated Turfs: [world.maxx*world.maxy*world.maxz - simulated_turf_coun
 	if(block & AIR_BLOCKED) return
 
 	var/direct = !(block & ZONE_BLOCKED)
-	var/space = !istype(B)
+	var/space = !istype(B) || B.fake_unsim
 
 	if(!space)
 		if(min(A.zone.contents.len, B.zone.contents.len) < ZONE_MIN_SIZE || (direct && (equivalent_pressure(A.zone,B.zone) || times_fired == 0)))

@@ -132,7 +132,7 @@ turf/proc/hotspot_expose(exposed_temperature, exposed_volume, soh = 0)
 	. = 1
 
 	var/turf/simulated/my_tile = loc
-	if(!istype(my_tile) || !my_tile.zone)
+	if(!issimulated(my_tile) || !my_tile.zone)
 		if(my_tile && my_tile.fire == src)
 			my_tile.fire = null
 		RemoveFire()
@@ -161,7 +161,7 @@ turf/proc/hotspot_expose(exposed_temperature, exposed_volume, soh = 0)
 	for(var/direction in cardinal)
 		var/turf/simulated/enemy_tile = get_step(my_tile, direction)
 
-		if(istype(enemy_tile))
+		if(issimulated(enemy_tile))
 			if(my_tile.open_directions & direction) //Grab all valid bordering tiles
 				if(!enemy_tile.zone || enemy_tile.fire)
 					continue

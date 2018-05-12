@@ -13,7 +13,7 @@
 client/proc/Zone_Info(turf/T as null|turf)
 	set category = "Debug"
 	if(T)
-		if(istype(T,/turf/simulated) && T:zone)
+		if(issimulated(T) && T:zone)
 			T:zone:dbg_data(src)
 		else
 			mob << "No zone here."
@@ -57,7 +57,7 @@ client/proc/Test_ZAS_Connection(var/turf/simulated/T as turf)
 		return
 
 	var/turf/simulated/other_turf = get_step(T, direction_list[direction])
-	if(!istype(other_turf))
+	if(!issimulated(other_turf))
 		return
 
 	var/t_block

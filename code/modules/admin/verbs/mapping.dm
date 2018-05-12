@@ -220,7 +220,7 @@ var/list/debug_verbs = list (
 
 	var/turf/simulated/location = get_turf(usr)
 
-	if(!istype(location, /turf/simulated)) // We're in space, let's not cause runtimes.
+	if(!issimulated(location)) // We're in space, let's not cause runtimes.
 		usr << "<span class='warning'>this debug tool cannot be used from space</span>"
 		return
 

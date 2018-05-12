@@ -1,8 +1,12 @@
-/turf/simulated/var/zone/zone
-/turf/simulated/var/open_directions
+/turf/simulated
+	var/zone/zone
+	var/open_directions
+	var/fake_unsim = FALSE
 
-/turf/var/needs_air_update = 0
-/turf/var/datum/gas_mixture/air
+/turf
+	var/needs_air_update = 0
+	var/datum/gas_mixture/air
+	var/always_block = FALSE
 
 /turf/simulated/proc/update_graphic(list/graphic_add = null, list/graphic_remove = null)
 	if (LAZYLEN(graphic_add))
@@ -40,11 +44,9 @@
 		if(r_block & AIR_BLOCKED)
 			continue
 
-		if(istype(unsim, /turf/simulated))
-
+		if(issimulated(unsim))
 			var/turf/simulated/sim = unsim
 			if(TURF_HAS_VALID_ZONE(sim))
-
 				SSair.connect(sim, src)
 
 
@@ -54,7 +56,7 @@
 	if (T.zone) { \
 		for (var/_gzn_dir in gzn_check) { \
 			var/turf/simulated/other = get_step(T, _gzn_dir); \
-			if (istype(other) && other.zone == T.zone) { \
+			if (issimulated(other) && other.zone == T.zone) { \
 				var/block; \
 				ATMOS_CANPASS_TURF(block, other, T); \
 				if (!(block & AIR_BLOCKED)) { \
@@ -82,7 +84,7 @@
 		if((dir & check_dirs) == dir)
 			//check that they are connected by the corner turf
 			var/turf/simulated/T = get_step(src, dir)
-			if (!istype(T))
+			if (!issimulated(T))
 				. &= ~dir
 				continue
 
@@ -97,7 +99,6 @@
 #undef GET_ZONE_NEIGHBOURS
 
 /turf/simulated/update_air_properties()
-
 	if(zone && zone.invalid) //this turf's zone is in the process of being rebuilt
 		c_copy_air() //not very efficient :(
 		zone = null //Easier than iterating through the list at the zone.
@@ -157,7 +158,7 @@
 
 			//Check that our zone hasn't been cut off recently.
 			//This happens when windows move or are constructed. Try to remove first, otherwise we need to rebuild.
-			if((previously_open & d) && istype(unsim, /turf/simulated))
+			if((previously_open & d) && issimulated(unsim))
 				var/turf/simulated/sim = unsim
 				if(zone && sim.zone == zone)
 					if (can_safely_remove_from_zone())
@@ -171,9 +172,8 @@
 
 		open_directions |= d
 
-		if(istype(unsim, /turf/simulated))
-
-			var/turf/simulated/sim = unsim
+		var/turf/simulated/sim = unsim
+		if(issimulated(sim))
 			sim.open_directions |= reverse_dir[d]
 
 			if(TURF_HAS_VALID_ZONE(sim))
